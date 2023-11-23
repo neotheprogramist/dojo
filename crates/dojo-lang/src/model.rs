@@ -64,6 +64,14 @@ pub fn handle_model_struct(
     let serialized_keys: Vec<_> =
         keys.iter().filter_map(|m| serialize_member(m, true)).collect::<_>();
 
+    let serialized_key_names: Vec<_> = keys
+        .iter()
+        .filter(|m| m.key)
+        .map(|m| {
+            RewriteNode::Text(format!("array::ArrayTrait::append(ref serialized, '{}');", m.name))
+        })
+        .collect::<_>();
+
     let serialized_values: Vec<_> =
         members.iter().filter_map(|m| serialize_member(m, false)).collect::<_>();
 
@@ -83,6 +91,13 @@ pub fn handle_model_struct(
                 fn keys(self: @$type_name$) -> Span<felt252> {
                     let mut serialized = ArrayTrait::new();
                     $serialized_keys$
+                    array::ArrayTrait::span(@serialized)
+                }
+
+                #[inline(always)]
+                fn key_names(self: @$type_name$) -> Span<felt252> {
+                    let mut serialized = ArrayTrait::new();
+                    $serialized_key_names$
                     array::ArrayTrait::span(@serialized)
                 }
 
@@ -160,6 +175,10 @@ pub fn handle_model_struct(
                 ),
                 ("schema_introspection".to_string(), handle_introspect_struct(db, struct_ast)),
                 ("serialized_keys".to_string(), RewriteNode::new_modified(serialized_keys)),
+                (
+                    "serialized_key_names".to_string(),
+                    RewriteNode::new_modified(serialized_key_names),
+                ),
                 ("serialized_values".to_string(), RewriteNode::new_modified(serialized_values)),
             ]),
         ),

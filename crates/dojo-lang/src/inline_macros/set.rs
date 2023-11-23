@@ -155,7 +155,9 @@ impl InlineMacroExprPlugin for SetMacro {
                 "
                 let __set_macro_value__ = {};
                 {}.set_entity(dojo::model::Model::name(@__set_macro_value__),
-                 dojo::model::Model::keys(@__set_macro_value__), 0_u8,
+                 dojo::model::Model::keys(@__set_macro_value__), 
+                 dojo::model::Model::key_names(@__set_macro_value__), 
+                 0_u8,
                  dojo::model::Model::values(@__set_macro_value__),
                  dojo::model::Model::layout(@__set_macro_value__));",
                 entity,

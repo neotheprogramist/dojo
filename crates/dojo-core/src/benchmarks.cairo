@@ -163,7 +163,7 @@ fn bench_index() {
 }
 
 #[test]
-#[available_gas(1000000000)]
+#[available_gas(3000000000)]
 fn bench_big_index() {
     let gas = testing::get_available_gas();
     gas::withdraw_gas().unwrap();
@@ -251,7 +251,7 @@ fn bench_indexed_database_array() {
 
     let gas = testing::get_available_gas();
     gas::withdraw_gas().unwrap();
-    database::set_with_index('table', 'even', nil, nil, 0, even, layout);
+    database::set_with_index('table', 'even', 0, nil, nil, even, layout);
     end(gas, 'dbi set arr 1st');
 
     let gas = testing::get_available_gas();
@@ -261,7 +261,7 @@ fn bench_indexed_database_array() {
 
     let gas = testing::get_available_gas();
     gas::withdraw_gas().unwrap();
-    database::set_with_index('table', 'odd', nil, nil, 0, odd, layout);
+    database::set_with_index('table', 'odd', 0, nil, nil, odd, layout);
     end(gas, 'dbi set arr 2nd');
 
     let gas = testing::get_available_gas();

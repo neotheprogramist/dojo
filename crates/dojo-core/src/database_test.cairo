@@ -118,8 +118,8 @@ fn test_database_scan() {
     let key_names = array!['x'].span();
     let key_values = array!['x'].span();
 
-    set_with_index('table', 'even', key_names, array![2].span(), 0, even, layout);
-    set_with_index('table', 'odd', key_names, array![1].span(), 0, odd, layout);
+    set_with_index('table', 'even', 0, key_names, array![2].span(), even, layout);
+    set_with_index('table', 'odd', 0, key_names, array![1].span(), odd, layout);
 
     let values = scan(Clause::All('table'), 3, layout);
     assert(values.len() == 2, 'Wrong number of values!');
@@ -144,9 +144,9 @@ fn test_database_scan_where() {
 
     let key_names = array!['p', 'x'].span();
 
-    set_with_index('table', 'some', key_names, some, 0, some, layout);
-    set_with_index('table', 'same', key_names, same, 0, same, layout);
-    set_with_index('table', 'other', key_names, other, 0, other, layout);
+    set_with_index('table', 'some', 0, key_names, some, some, layout);
+    set_with_index('table', 'same', 0, key_names, same, same, layout);
+    set_with_index('table', 'other', 0, key_names, other, other, layout);
 
     let values = scan(Clause::All('table'), 2, layout);
     assert(values.len() == 3, 'Wrong number of values!');
@@ -177,9 +177,9 @@ fn test_database_scan_where_deletion() {
     let keys_a = array!['a', 'y'].span();
     let keys_b = array!['b', 'y'].span();
 
-    set_with_index('model', 'some', keys_a, array![1, 3].span(), 0, value, layout);
-    set_with_index('model', 'same', keys_a, array![1, 3].span(), 0, value, layout);
-    set_with_index('model', 'other', keys_b, array![5, 3].span(), 0, value, layout);
+    set_with_index('model', 'some', 0, keys_a, array![1, 3].span(), value, layout);
+    set_with_index('model', 'same', 0, keys_a, array![1, 3].span(), value, layout);
+    set_with_index('model', 'other', 0, keys_b, array![5, 3].span(), value, layout);
 
     del('model', 'same', keys_a);
 

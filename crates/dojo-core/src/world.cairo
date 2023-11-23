@@ -20,6 +20,7 @@ trait IWorld<T> {
         ref self: T,
         model: felt252,
         keys: Span<felt252>,
+        key_names: Span<felt252>,
         offset: u8,
         values: Span<felt252>,
         layout: Span<u8>
@@ -31,7 +32,13 @@ trait IWorld<T> {
     fn set_executor(ref self: T, contract_address: ContractAddress);
     fn executor(self: @T) -> ContractAddress;
     fn base(self: @T) -> ClassHash;
-    fn delete_entity(ref self: T, model: felt252, keys: Span<felt252>, layout: Span<u8>);
+    fn delete_entity(
+        ref self: T, 
+        model: felt252, 
+        keys: Span<felt252>, 
+        key_names: Span<felt252>,
+        layout: Span<u8>
+    );
     fn is_owner(self: @T, address: ContractAddress, resource: felt252) -> bool;
     fn grant_owner(ref self: T, address: ContractAddress, resource: felt252);
     fn revoke_owner(ref self: T, address: ContractAddress, resource: felt252);
@@ -468,13 +475,16 @@ mod world {
         /// # Arguments
         ///
         /// * `model` - The name of the model to be set.
-        /// * `key` - The key to be used to find the entity.
+        /// * `keys` - The keys to be used to find the entity.
+        /// * `key_names` - Nemes for each of keys to query entities.
         /// * `offset` - The offset of the model in the entity.
         /// * `value` - The value to be set.
+        /// * `layout` - The layout of the model.
         fn set_entity(
             ref self: ContractState,
             model: felt252,
             keys: Span<felt252>,
+            key_names: Span<felt252>,
             offset: u8,
             values: Span<felt252>,
             layout: Span<u8>
@@ -482,8 +492,8 @@ mod world {
             assert_can_write(@self, model, get_caller_address());
 
             let key = poseidon::poseidon_hash_span(keys);
-            // database::set_with_index(model, key, keys, offset, values, layout);
-            database::set(model, key, offset, values, layout);
+            database::set_with_index(model, key, offset, key_names, keys, values, layout);
+            // database::set(model, key, offset, values, layout);
 
             EventEmitter::emit(ref self, StoreSetRecord { table: model, keys, offset, values });
         }
@@ -495,7 +505,11 @@ mod world {
         /// * `model` - The name of the model to be deleted.
         /// * `query` - The query to be used to find the entity.
         fn delete_entity(
-            ref self: ContractState, model: felt252, keys: Span<felt252>, layout: Span<u8>
+            ref self: ContractState,
+            model: felt252,
+            keys: Span<felt252>,
+            key_names: Span<felt252>,
+            layout: Span<u8>
         ) {
             assert_can_write(@self, model, get_caller_address());
 
@@ -515,7 +529,7 @@ mod world {
             let key = poseidon::poseidon_hash_span(keys);
             database::set(model, key, 0, empty_values.span(), layout);
             // this deletes the index
-            database::del(model, key, array!['TODO: get names'].span());
+            database::del(model, key, key_names);
 
             EventEmitter::emit(ref self, StoreDelRecord { table: model, keys });
         }

@@ -1,6 +1,7 @@
 trait Model<T> {
     fn name(self: @T) -> felt252;
     fn keys(self: @T) -> Span<felt252>;
+    fn key_names(self: @T) -> Span<felt252>;
     fn values(self: @T) -> Span<felt252>;
     fn layout(self: @T) -> Span<u8>;
     fn packed_size(self: @T) -> usize;

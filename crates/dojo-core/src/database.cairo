@@ -64,22 +64,23 @@ fn set(model: felt252, key: felt252, offset: u8, value: Span<felt252>, layout: S
 /// # Arguments
 /// * `model` - The model to create the entry in.
 /// * `id` - id of the created entry, hash of all `key_values`.
+/// * `offset` - The offset of the entry.
 /// * `key_names` - The members to create an index on.
 /// * `key_values` - The members to create an index on (or hash of values if longer than felt252).
-/// * `offset` - The offset of the entry.
 /// * `value` - The value of the entry.
 /// * `layout` - The layout of the entry.
 fn set_with_index(
     model: felt252,
     id: felt252,
+    offset: u8,
     key_names: Span<felt252>,
     key_values: Span<felt252>,
-    offset: u8,
     values: Span<felt252>,
     layout: Span<u8>
 ) {
     set(model, id, offset, values, layout);
     index::create(0, model, id, 0); // create a record in index of all records
+
 
     assert(key_names.len() == key_values.len(), 'keys must be same len');
 
