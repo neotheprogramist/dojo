@@ -515,7 +515,7 @@ mod world {
             let key = poseidon::poseidon_hash_span(keys);
             database::set(model, key, 0, empty_values.span(), layout);
             // this deletes the index
-            database::del(model, key);
+            database::del(model, key, array!['TODO: get names'].span());
 
             EventEmitter::emit(ref self, StoreDelRecord { table: model, keys });
         }

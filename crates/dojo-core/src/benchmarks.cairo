@@ -237,7 +237,7 @@ fn bench_database_array() {
 
     let gas = testing::get_available_gas();
     gas::withdraw_gas().unwrap();
-    database::del('table', 'key');
+    database::del('table', 'key', array![].span());
     end(gas, 'db del arr');
 }
 
@@ -247,10 +247,11 @@ fn bench_indexed_database_array() {
     let even = array![2, 4].span();
     let odd = array![1, 3].span();
     let layout = array![251, 251].span();
+    let nil = array![].span();
 
     let gas = testing::get_available_gas();
     gas::withdraw_gas().unwrap();
-    database::set_with_index('table', 'even', array![].span(), 0, even, layout);
+    database::set_with_index('table', 'even', nil, nil, 0, even, layout);
     end(gas, 'dbi set arr 1st');
 
     let gas = testing::get_available_gas();
@@ -260,7 +261,7 @@ fn bench_indexed_database_array() {
 
     let gas = testing::get_available_gas();
     gas::withdraw_gas().unwrap();
-    database::set_with_index('table', 'odd', array![].span(), 0, odd, layout);
+    database::set_with_index('table', 'odd', nil, nil, 0, odd, layout);
     end(gas, 'dbi set arr 2nd');
 
     let gas = testing::get_available_gas();

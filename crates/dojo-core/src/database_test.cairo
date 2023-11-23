@@ -104,7 +104,7 @@ fn test_database_del() {
     let before = get('table', 'key', 0, values.len(), array![251].span());
     assert(*before.at(0) == *values.at(0), 'Values different at index 0!');
 
-    del('table', 'key');
+    del('table', 'key', values.span());
     let after = get('table', 'key', 0, 0, array![].span());
     assert(after.len() == 0, 'Non empty after deletion!');
 }
@@ -115,9 +115,11 @@ fn test_database_scan() {
     let even = array![2, 4, 6].span();
     let odd = array![1, 3, 5].span();
     let layout = array![251, 251, 251].span();
+    let key_names = array!['x'].span();
+    let key_values = array!['x'].span();
 
-    set_with_index('table', 'even', array!['x'].span(), 0, even, layout);
-    set_with_index('table', 'odd', array!['x'].span(), 0, odd, layout);
+    set_with_index('table', 'even', key_names, array![2].span(), 0, even, layout);
+    set_with_index('table', 'odd', key_names, array![1].span(), 0, odd, layout);
 
     let values = scan(Clause::All('table'), 3, layout);
     assert(values.len() == 2, 'Wrong number of values!');
@@ -140,9 +142,11 @@ fn test_database_scan_where() {
     let other = array![5, 5].span();
     let layout = array![251, 251].span();
 
-    set_with_index('table', 'some', array!['p', 'x'].span(), 0, some, layout);
-    set_with_index('table', 'same', array!['p', 'x'].span(), 0, same, layout);
-    set_with_index('table', 'other', array!['p', 'x'].span(), 0, other, layout);
+    let key_names = array!['p', 'x'].span();
+
+    set_with_index('table', 'some', key_names, some, 0, some, layout);
+    set_with_index('table', 'same', key_names, same, 0, same, layout);
+    set_with_index('table', 'other', key_names, other, 0, other, layout);
 
     let values = scan(Clause::All('table'), 2, layout);
     assert(values.len() == 3, 'Wrong number of values!');
@@ -168,12 +172,16 @@ fn test_database_scan_where() {
 #[available_gas(20000000)]
 fn test_database_scan_where_deletion() {
     let layout = array![251, 251].span();
+    let value = array![1, 1].span();
 
-    set_with_index('model', 'some', array!['a', 'y'].span(), 0, array![2, 3].span(), layout);
-    set_with_index('model', 'same', array!['a', 'y'].span(), 0, array![1, 3].span(), layout);
-    set_with_index('model', 'other', array!['b', 'y'].span(), 0, array![5, 3].span(), layout);
+    let keys_a = array!['a', 'y'].span();
+    let keys_b = array!['b', 'y'].span();
 
-    del('model', 'same');
+    set_with_index('model', 'some', keys_a, array![1, 3].span(), 0, value, layout);
+    set_with_index('model', 'same', keys_a, array![1, 3].span(), 0, value, layout);
+    set_with_index('model', 'other', keys_b, array![5, 3].span(), 0, value, layout);
+
+    del('model', 'same', keys_a);
 
     let mut where = MemberClause { model: 'model', member: 'a', value: 1 };
 
@@ -184,14 +192,14 @@ fn test_database_scan_where_deletion() {
     where.member = 'y';
     where.value = 3;
     let values = scan(Clause::Member(where), 2, layout);
-    assert(values.len() == 3, 'Wrong len for  y = 3');
+    assert(values.len() == 2, 'Wrong len for  y = 3');
 
-    del('model', 'some');
-    del('model', 'other');
+    del('model', 'some', keys_a);
+    del('model', 'other', keys_b);
 
     let values = scan(Clause::Member(where), 2, layout);
-    assert(values.len() == 1, 'Wrong len for del y = 3');
+    assert(values.len() == 0, 'Wrong len for del y = 3');
 
     let values = scan(Clause::All('model'), 2, layout);
-    assert(values.len() == 1, 'Wrong len for scan');
+    assert(values.len() == 0, 'Wrong len for scan');
 }
