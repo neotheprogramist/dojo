@@ -63,53 +63,56 @@ fn set(model: felt252, key: felt252, offset: u8, value: Span<felt252>, layout: S
 /// Creates an entry in the database and adds it to appropriate indexes.
 /// # Arguments
 /// * `model` - The model to create the entry in.
-/// * `key` - key of the created entry.
-/// * `members` - The members to create an index on.
+/// * `id` - id of the created entry, hash of all `key_values`.
+/// * `key_names` - The members to create an index on.
+/// * `key_values` - The members to create an index on (or hash of values if longer than felt252).
 /// * `offset` - The offset of the entry.
 /// * `value` - The value of the entry.
 /// * `layout` - The layout of the entry.
 fn set_with_index(
     model: felt252,
-    key: felt252,
-    members: Span<felt252>,
+    id: felt252,
+    key_names: Span<felt252>,
+    key_values: Span<felt252>,
     offset: u8,
     values: Span<felt252>,
     layout: Span<u8>
 ) {
-    set(model, key, offset, values, layout);
-    index::create(0, model, key, 0); // create a record in index of all records
+    set(model, id, offset, values, layout);
+    index::create(0, model, id, 0); // create a record in index of all records
+
+    assert(key_names.len() == key_values.len(), 'keys must be same len');
 
     let mut idx = 0;
     loop {
-        if idx == members.len() {
+        if idx == key_names.len() {
             break;
-        }
+        } 
 
-        let index = poseidon_hash_span(array![model, *members.at(idx)].span());
-        index::create(0, index, key, *values.at(idx)); // create a record for each of the indexes
+        let index = poseidon_hash_span(array![model, *key_names.at(idx)].span());
+        index::create(0, index, id, *key_values.at(idx)); // create a record for each of the indexes
         idx += 1;
     };
 }
 
-fn del(model: felt252, key: felt252) {
+/// Remove an entry in the database and all indexes.
+/// # Arguments
+/// * `model` - The model containg the entry.
+/// * `id` - id of the the entry.
+/// * `key_names` - The members on which indexes were created.
+fn del(model: felt252, key: felt252, key_names: Span<felt252>) {
     index::delete(0, model, key);
-
-    let len_keys = array!['dojo_storage_keys_len', model, key].span();
-    let len = storage::get(0, len_keys);
 
     let mut idx = 0;
     loop {
-        if idx == len {
+        if idx == key_names.len() {
             break;
         }
-        let index = poseidon_hash_span(array![model, idx].span());
+        let index = poseidon_hash_span(array![model, *key_names.at(idx)].span());
 
         index::delete(0, index, key);
-
         idx += 1;
     };
-
-    storage::set(0, len_keys, 0); // overwrite the number of keys
 }
 
 // Query all entities that meet a criteria. If no index is defined,
