@@ -530,37 +530,37 @@ impl PositionSchemaIntrospection of dojo::database::schema::SchemaIntrospection<
 
 //! > expected_diagnostics
 error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:96:13
+ --> test_src/lib.cairo[Position]:103:13
             #[starknet::contract]
             ^*******************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:100:17
+ --> test_src/lib.cairo[Position]:107:17
                 #[storage]
                 ^********^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:103:17
+ --> test_src/lib.cairo[Position]:110:17
                 #[external(v0)]
                 ^*************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:108:17
+ --> test_src/lib.cairo[Position]:115:17
                 #[external(v0)]
                 ^*************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:113:17
-                #[external(v0)]
-                ^*************^
-
-error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:121:17
+ --> test_src/lib.cairo[Position]:120:17
                 #[external(v0)]
                 ^*************^
 
 error: Unsupported attribute.
  --> test_src/lib.cairo[Position]:128:17
+                #[external(v0)]
+                ^*************^
+
+error: Unsupported attribute.
+ --> test_src/lib.cairo[Position]:135:17
                 #[external(v0)]
                 ^*************^
 
@@ -920,6 +920,13 @@ impl PositionDrop of Drop::<Position>;
                 fn keys(self: @Position) -> Span<felt252> {
                     let mut serialized = ArrayTrait::new();
                     serde::Serde::serialize(self.player, ref serialized);
+                    array::ArrayTrait::span(@serialized)
+                }
+
+                #[inline(always)]
+                fn key_names(self: @Position) -> Span<felt252> {
+                    let mut serialized = ArrayTrait::new();
+                    array::ArrayTrait::append(ref serialized, 'player');
                     array::ArrayTrait::span(@serialized)
                 }
 

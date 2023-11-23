@@ -8,7 +8,7 @@ test_manifest_file
   "world": {
     "name": "world",
     "address": null,
-    "class_hash": "0x29876955238aa850c8337389f8685e1f180dd215a791f94118377531baffc7",
+    "class_hash": "0x34e2647646d4984c598915ec4c05423230a0b5f57a08a7c6593b87690021658",
     "abi": [
       {
         "type": "impl",
@@ -305,6 +305,10 @@ test_manifest_file
                 "type": "core::array::Span::<core::felt252>"
               },
               {
+                "name": "key_names",
+                "type": "core::array::Span::<core::felt252>"
+              },
+              {
                 "name": "offset",
                 "type": "core::integer::u8"
               },
@@ -404,6 +408,10 @@ test_manifest_file
               },
               {
                 "name": "keys",
+                "type": "core::array::Span::<core::felt252>"
+              },
+              {
+                "name": "key_names",
                 "type": "core::array::Span::<core::felt252>"
               },
               {
@@ -963,7 +971,7 @@ test_manifest_file
     {
       "name": "actions",
       "address": null,
-      "class_hash": "0x1f740b30fc835ecf509a40e8dc8e4eb7ada046243833d2060f17ab961e4e154",
+      "class_hash": "0x6f01e6492b412c2814eb55c8a458527596891e46934577e72e07253cc7abdd9",
       "abi": [
         {
           "type": "impl",

@@ -196,6 +196,26 @@ Block(
                                     ),
                                 ),
                                 Value(
+                                    FunctionCall(
+                                        ExprFunctionCall {
+                                            function: test::HealthModel::key_names,
+                                            args: [
+                                                Value(
+                                                    Snapshot(
+                                                        ExprSnapshot {
+                                                            inner: Var(
+                                                                LocalVarId(test::__set_macro_value__),
+                                                            ),
+                                                            ty: @test::Health,
+                                                        },
+                                                    ),
+                                                ),
+                                            ],
+                                            ty: core::array::Span::<core::felt252>,
+                                        },
+                                    ),
+                                ),
+                                Value(
                                     Literal(
                                         ExprLiteral {
                                             value: 0,

@@ -526,42 +526,37 @@ struct Roles {
        ^***^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:80:13
+ --> test_src/lib.cairo[Position]:87:13
             #[starknet::contract]
             ^*******************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Roles]:73:13
+ --> test_src/lib.cairo[Roles]:80:13
             #[starknet::contract]
             ^*******************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Player]:87:13
+ --> test_src/lib.cairo[Player]:94:13
             #[starknet::contract]
             ^*******************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:84:17
+ --> test_src/lib.cairo[Position]:91:17
                 #[storage]
                 ^********^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:87:17
+ --> test_src/lib.cairo[Position]:94:17
                 #[external(v0)]
                 ^*************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:92:17
+ --> test_src/lib.cairo[Position]:99:17
                 #[external(v0)]
                 ^*************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:97:17
-                #[external(v0)]
-                ^*************^
-
-error: Unsupported attribute.
- --> test_src/lib.cairo[Position]:105:17
+ --> test_src/lib.cairo[Position]:104:17
                 #[external(v0)]
                 ^*************^
 
@@ -571,27 +566,27 @@ error: Unsupported attribute.
                 ^*************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Roles]:77:17
+ --> test_src/lib.cairo[Position]:119:17
+                #[external(v0)]
+                ^*************^
+
+error: Unsupported attribute.
+ --> test_src/lib.cairo[Roles]:84:17
                 #[storage]
                 ^********^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Roles]:80:17
+ --> test_src/lib.cairo[Roles]:87:17
                 #[external(v0)]
                 ^*************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Roles]:85:17
+ --> test_src/lib.cairo[Roles]:92:17
                 #[external(v0)]
                 ^*************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Roles]:90:17
-                #[external(v0)]
-                ^*************^
-
-error: Unsupported attribute.
- --> test_src/lib.cairo[Roles]:98:17
+ --> test_src/lib.cairo[Roles]:97:17
                 #[external(v0)]
                 ^*************^
 
@@ -601,32 +596,37 @@ error: Unsupported attribute.
                 ^*************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Player]:91:17
+ --> test_src/lib.cairo[Roles]:112:17
+                #[external(v0)]
+                ^*************^
+
+error: Unsupported attribute.
+ --> test_src/lib.cairo[Player]:98:17
                 #[storage]
                 ^********^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Player]:94:17
+ --> test_src/lib.cairo[Player]:101:17
                 #[external(v0)]
                 ^*************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Player]:99:17
+ --> test_src/lib.cairo[Player]:106:17
                 #[external(v0)]
                 ^*************^
 
 error: Unsupported attribute.
- --> test_src/lib.cairo[Player]:104:17
-                #[external(v0)]
-                ^*************^
-
-error: Unsupported attribute.
- --> test_src/lib.cairo[Player]:112:17
+ --> test_src/lib.cairo[Player]:111:17
                 #[external(v0)]
                 ^*************^
 
 error: Unsupported attribute.
  --> test_src/lib.cairo[Player]:119:17
+                #[external(v0)]
+                ^*************^
+
+error: Unsupported attribute.
+ --> test_src/lib.cairo[Player]:126:17
                 #[external(v0)]
                 ^*************^
 
@@ -772,6 +772,13 @@ impl PositionSerde of Serde::<Position> {
                 }
 
                 #[inline(always)]
+                fn key_names(self: @Position) -> Span<felt252> {
+                    let mut serialized = ArrayTrait::new();
+                    array::ArrayTrait::append(ref serialized, 'id');
+                    array::ArrayTrait::span(@serialized)
+                }
+
+                #[inline(always)]
                 fn values(self: @Position) -> Span<felt252> {
                     let mut serialized = ArrayTrait::new();
                     serde::Serde::serialize(self.v, ref serialized);
@@ -892,6 +899,13 @@ impl RolesSerde of Serde::<Roles> {
 
                 #[inline(always)]
                 fn keys(self: @Roles) -> Span<felt252> {
+                    let mut serialized = ArrayTrait::new();
+                    
+                    array::ArrayTrait::span(@serialized)
+                }
+
+                #[inline(always)]
+                fn key_names(self: @Roles) -> Span<felt252> {
                     let mut serialized = ArrayTrait::new();
                     
                     array::ArrayTrait::span(@serialized)
@@ -1019,6 +1033,13 @@ impl PlayerSerde of Serde::<Player> {
                 fn keys(self: @Player) -> Span<felt252> {
                     let mut serialized = ArrayTrait::new();
                     array::ArrayTrait::append(ref serialized, *self.game);serde::Serde::serialize(self.player, ref serialized);
+                    array::ArrayTrait::span(@serialized)
+                }
+
+                #[inline(always)]
+                fn key_names(self: @Player) -> Span<felt252> {
+                    let mut serialized = ArrayTrait::new();
+                    array::ArrayTrait::append(ref serialized, 'game');array::ArrayTrait::append(ref serialized, 'player');
                     array::ArrayTrait::span(@serialized)
                 }
 
