@@ -79,11 +79,15 @@ fn set_with_index(
     layout: Span<u8>
 ) {
     set(model, id, offset, values, layout);
+
+    // If entry is alredy in the indexes we don't need to do anything else.
+    if index::exists(0, model, id) {
+        return ();
+    }
+
     index::create(0, model, id, 0); // create a record in index of all records
 
-
     assert(key_names.len() == key_values.len(), 'keys must be same len');
-
     let mut idx = 0;
     loop {
         if idx == key_names.len() {
