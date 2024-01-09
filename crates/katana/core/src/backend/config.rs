@@ -11,7 +11,7 @@ use crate::env::BlockContextGenerator;
 #[derive(Debug, Clone)]
 pub struct StarknetConfig {
     pub seed: [u8; 32],
-    pub total_accounts: u8,
+    pub total_accounts: u16,
     pub disable_fee: bool,
     pub env: Environment,
     pub fork_rpc_url: Option<Url>,
