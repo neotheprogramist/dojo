@@ -89,7 +89,7 @@ impl Display for Account {
 }
 
 pub struct DevAccountGenerator {
-    pub total: u8,
+    pub total: u16,
     pub seed: [u8; 32],
     pub balance: FieldElement,
     pub class_hash: FieldElement,
@@ -97,7 +97,7 @@ pub struct DevAccountGenerator {
 
 impl DevAccountGenerator {
     #[must_use]
-    pub fn new(total: u8) -> Self {
+    pub fn new(total: u16) -> Self {
         Self {
             total,
             seed: [0u8; 32],
