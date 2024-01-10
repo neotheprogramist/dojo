@@ -808,6 +808,7 @@ dependencies = [
  "futures",
  "hex",
  "katana-core",
+ "katana-runner",
  "lazy_static",
  "proptest",
  "reqwest",
@@ -5732,8 +5733,9 @@ version = "0.5.1-alpha.0"
 dependencies = [
  "anyhow",
  "home",
+ "katana-core",
  "lazy_static",
- "runner_macro",
+ "runner-macro",
  "starknet",
  "tokio",
  "url",
@@ -7854,7 +7856,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "runner_macro"
+name = "runner-macro"
 version = "0.1.0"
 dependencies = [
  "quote",
