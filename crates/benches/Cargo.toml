@@ -20,3 +20,5 @@ hex.workspace = true
 lazy_static.workspace = true
 starknet.workspace = true
 tokio.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
