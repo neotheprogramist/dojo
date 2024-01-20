@@ -5737,6 +5737,7 @@ dependencies = [
  "chrono",
  "home",
  "katana-core",
+ "katana-primitives",
  "lazy_static",
  "runner-macro",
  "starknet",
