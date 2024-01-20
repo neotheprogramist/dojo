@@ -10,9 +10,8 @@ use starknet::providers::JsonRpcClient;
 use starknet::signers::LocalWallet;
 use tokio::sync::OnceCell;
 
-use crate::CONTRACT;
-
 pub type OwnerAccount = SingleOwnerAccount<JsonRpcClient<HttpTransport>, LocalWallet>;
+#[derive(Clone)]
 pub struct BenchCall(pub &'static str, pub Vec<FieldElement>);
 
 // Because no calls are actually executed in the benchmark, we can use the same nonce for all of
@@ -24,8 +23,7 @@ pub async fn cached_nonce(account: &OwnerAccount) -> FieldElement {
 }
 
 pub fn log(name: &str, gas: u64, calldata: &str) {
-    let mut file =
-        OpenOptions::new().create(true).write(true).append(true).open("gas_usage.txt").unwrap();
+    let mut file = OpenOptions::new().create(true).append(true).open("gas_usage.txt").unwrap();
 
     let mut calldata = String::from(calldata);
     if !calldata.is_empty() {
@@ -36,11 +34,11 @@ pub fn log(name: &str, gas: u64, calldata: &str) {
     file.flush().unwrap();
 }
 
-pub fn parse_calls(entrypoints_and_calldata: Vec<BenchCall>) -> Vec<Call> {
-    entrypoints_and_calldata
+pub fn parse_calls(calls: Vec<BenchCall>, to: &FieldElement) -> Vec<Call> {
+    calls
         .into_iter()
         .map(|BenchCall(name, calldata)| Call {
-            to: *CONTRACT,
+            to: *to,
             selector: get_selector_from_name(name).context("Failed to get selector").unwrap(),
             calldata,
         })

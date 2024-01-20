@@ -8,9 +8,11 @@ version.workspace = true
 [dependencies]
 runner-macro = { path = "./runner-macro" }
 katana-core = { path = "../core" }
+katana-primitives = { path = "../primitives" }
 anyhow.workspace = true
 home = "0.5.5"
 lazy_static.workspace = true
 starknet.workspace = true
 tokio.workspace = true
 url.workspace = true
+chrono.workspace = true
