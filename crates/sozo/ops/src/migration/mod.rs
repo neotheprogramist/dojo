@@ -728,8 +728,14 @@ where
         })
         .collect::<Vec<_>>();
 
-    let InvokeTransactionResult { transaction_hash } =
-        migrator.execute(calls).send().await.map_err(|e| {
+    let InvokeTransactionResult { transaction_hash } = migrator
+        .execute(calls)
+        .fee_estimate_multiplier(
+            txn_config.unwrap_or_default().fee_estimate_multiplier.unwrap_or(1.1),
+        )
+        .send()
+        .await
+        .map_err(|e| {
             ui.verbose(format!("{e:?}"));
             anyhow!("Failed to register models to World: {e}")
         })?;
