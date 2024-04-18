@@ -2,6 +2,7 @@ use starknet::{ContractAddress, ClassHash, StorageBaseAddress, SyscallResult};
 use traits::{Into, TryInto};
 use option::OptionTrait;
 use dojo::resource_metadata::ResourceMetadata;
+use dojo::config::{config_cpt, config_cpt::InternalTrait as ConfigInternal, IConfig};
 
 #[starknet::interface]
 trait IWorld<T> {
@@ -569,7 +570,12 @@ use core::traits::TryInto;
     #[abi(embed_v0)]
     impl UpgradeableState of IUpgradeableState<ContractState> {
         fn upgrade_state(ref self: ContractState, new_state: Span<StorageUpdate>, program_output: ProgramOutput) {
-            let program_hash = 18468145346606952491117791430885172818429658569709932865894865254677766952;
+            //let program_hash = 18468145346606952491117791430885172818429658569709932865894865254677766952;
+            let (current_program_hash, current_config_hash): (felt252, felt252) = self
+                .config
+                .program_info
+                .read();
+
             let mut da_hasher = PedersenImpl::new(0);
             let mut i = 0;
             loop {
@@ -608,10 +614,10 @@ use core::traits::TryInto;
             };
             program_output_hash = program_output_hash.finalize();
 
-            let fact = poseidon::PoseidonImpl::new().update(program_hash).update(program_output_hash).finalize();
+            let fact = poseidon::PoseidonImpl::new().update(current_program_hash).update(program_output_hash).finalize();
             assert(
                 IFactRegistryDispatcher {
-                    contract_address: contract_address_const::<0x217746a5f74c2e5b6fa92c97e902d8cd78b1fabf1e8081c4aa0d2fe159bc0eb>()
+                    contract_address: self.config.get_facts_registry() 
                 }.is_valid(fact),
                 'no state transition proof'
             );

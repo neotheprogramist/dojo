@@ -21,3 +21,20 @@ mod benchmarks;
 
 mod components;
 mod resource_metadata;
+
+
+// Components 
+mod config {
+    mod component;
+    mod interface;
+    mod mock;
+
+    use component::config_cpt;
+    use interface::{IConfig, IConfigDispatcher, IConfigDispatcherTrait};
+    use mock::config_mock;
+
+    #[cfg(test)]
+    mod tests {
+        mod test_config;
+    }
+}
