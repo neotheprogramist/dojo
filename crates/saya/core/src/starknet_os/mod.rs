@@ -11,15 +11,13 @@ use std::time::Duration;
 
 use anyhow::bail;
 use itertools::chain;
-use starknet::accounts::ConnectedAccount;
-use starknet::accounts::{Account, Call, ExecutionEncoding, SingleOwnerAccount};
+use starknet::accounts::{Account, Call, ConnectedAccount, ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::{
     BlockId, BlockTag, FieldElement, TransactionExecutionStatus, TransactionStatus,
 };
 use starknet::core::utils::get_selector_from_name;
 use starknet::providers::jsonrpc::HttpTransport;
-use starknet::providers::JsonRpcClient;
-use starknet::providers::Provider;
+use starknet::providers::{JsonRpcClient, Provider};
 use starknet::signers::{LocalWallet, SigningKey};
 use tokio::time::sleep;
 use url::Url;

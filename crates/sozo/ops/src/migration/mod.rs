@@ -16,10 +16,10 @@ use dojo_world::migration::contract::ContractMigration;
 use dojo_world::migration::strategy::{generate_salt, prepare_for_migration, MigrationStrategy};
 use dojo_world::migration::world::WorldDiff;
 use dojo_world::migration::{
-    Declarable, DeployOutput, Deployable, MigrationError, RegisterOutput, StateDiff, TxConfig,
+    Declarable, DeployOutput, Deployable, MigrationError, RegisterOutput, StateDiff, TxnConfig,
     Upgradable, UpgradeOutput,
 };
-use dojo_world::utils::TransactionWaiter;
+use dojo_world::utils::{TransactionExt, TransactionWaiter};
 use futures::future;
 use scarb::core::Workspace;
 use scarb_ui::Ui;
@@ -60,6 +60,7 @@ pub struct ContractMigrationOutput {
     base_class_hash: FieldElement,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub async fn migrate<P, S>(
     ws: &Workspace<'_>,
     world_address: Option<FieldElement>,
@@ -68,7 +69,7 @@ pub async fn migrate<P, S>(
     account: &SingleOwnerAccount<P, S>,
     name: Option<String>,
     dry_run: bool,
-    txn_config: Option<TxConfig>,
+    txn_config: TxnConfig,
 ) -> Result<()>
 where
     P: Provider + Sync + Send + 'static,
@@ -144,7 +145,7 @@ where
                 .await?;
 
                 if !ws.config().offline() {
-                    upload_metadata(ws, account, migration_output).await?;
+                    upload_metadata(ws, account, migration_output, txn_config).await?;
                 }
             }
             Err(e) => {
@@ -167,6 +168,7 @@ where
     Ok(())
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn update_manifests_and_abis(
     ws: &Workspace<'_>,
     local_manifest: BaseManifest,
@@ -220,18 +222,16 @@ async fn update_manifests_and_abis(
                     .find(|c| c.name == output.name)
                     .expect("contract got migrated, means it should be present here");
 
-                let salt = generate_salt(&local.name);
-                local.inner.address = Some(get_contract_address(
-                    salt,
-                    output.base_class_hash,
-                    &[],
-                    migration_output.world_address,
-                ));
-
                 local.inner.base_class_hash = output.base_class_hash;
             }
         });
     }
+
+    local_manifest.contracts.iter_mut().for_each(|contract| {
+        let salt = generate_salt(&contract.name);
+        contract.inner.address =
+            Some(get_contract_address(salt, contract.inner.base_class_hash, &[], world_address));
+    });
 
     // copy abi files from `abi/base` to `abi/deployments/{chain_id}` and update abi path in
     // local_manifest
@@ -308,7 +308,7 @@ async fn update_manifest_abis(
 pub async fn apply_diff<P, S>(
     ws: &Workspace<'_>,
     account: &SingleOwnerAccount<P, S>,
-    txn_config: Option<TxConfig>,
+    txn_config: TxnConfig,
     strategy: &mut MigrationStrategy,
 ) -> Result<MigrationOutput>
 where
@@ -445,7 +445,7 @@ pub async fn execute_strategy<P, S>(
     ws: &Workspace<'_>,
     strategy: &mut MigrationStrategy,
     migrator: &SingleOwnerAccount<P, S>,
-    txn_config: Option<TxConfig>,
+    txn_config: TxnConfig,
 ) -> Result<MigrationOutput>
 where
     P: Provider + Sync + Send + 'static,
@@ -459,7 +459,7 @@ where
         Some(base) => {
             ui.print_header("# Base Contract");
 
-            match base.declare(migrator, txn_config.unwrap_or_default()).await {
+            match base.declare(migrator, &txn_config).await {
                 Ok(res) => {
                     ui.print_sub(format!("Class Hash: {:#x}", res.class_hash));
                 }
@@ -538,7 +538,7 @@ where
 
     // Once Torii supports indexing arrays, we should declare and register the
     // ResourceMetadata model.
-    match register_models(strategy, migrator, &ui, txn_config).await {
+    match register_models(strategy, migrator, &ui, &txn_config).await {
         Ok(output) => {
             migration_output.models = output.registered_model_names;
         }
@@ -548,7 +548,7 @@ where
         }
     };
 
-    match deploy_dojo_contracts(strategy, migrator, &ui, txn_config).await {
+    match deploy_dojo_contracts(strategy, migrator, &ui, &txn_config).await {
         Ok(output) => {
             migration_output.contracts = output;
         }
@@ -578,19 +578,14 @@ async fn deploy_contract<P, S>(
     constructor_calldata: Vec<FieldElement>,
     migrator: &SingleOwnerAccount<P, S>,
     ui: &Ui,
-    txn_config: &Option<TxConfig>,
+    txn_config: &TxnConfig,
 ) -> Result<ContractDeploymentOutput>
 where
     P: Provider + Sync + Send + 'static,
     S: Signer + Sync + Send + 'static,
 {
     match contract
-        .deploy(
-            contract.diff.local_class_hash,
-            constructor_calldata,
-            migrator,
-            txn_config.unwrap_or_default(),
-        )
+        .deploy(contract.diff.local_class_hash, constructor_calldata, migrator, txn_config)
         .await
     {
         Ok(mut val) => {
@@ -626,7 +621,7 @@ async fn upgrade_contract<P, S>(
     original_base_class_hash: FieldElement,
     migrator: &SingleOwnerAccount<P, S>,
     ui: &Ui,
-    txn_config: &Option<TxConfig>,
+    txn_config: &TxnConfig,
 ) -> Result<ContractUpgradeOutput>
 where
     P: Provider + Sync + Send + 'static,
@@ -638,7 +633,7 @@ where
             original_class_hash,
             original_base_class_hash,
             migrator,
-            (*txn_config).unwrap_or_default(),
+            txn_config,
         )
         .await
     {
@@ -668,7 +663,7 @@ async fn register_models<P, S>(
     strategy: &MigrationStrategy,
     migrator: &SingleOwnerAccount<P, S>,
     ui: &Ui,
-    txn_config: Option<TxConfig>,
+    txn_config: &TxnConfig,
 ) -> Result<RegisterOutput>
 where
     P: Provider + Sync + Send + 'static,
@@ -692,7 +687,7 @@ where
     for c in models.iter() {
         ui.print(italic_message(&c.diff.name).to_string());
 
-        let res = c.declare(migrator, txn_config.unwrap_or_default()).await;
+        let res = c.declare(migrator, txn_config).await;
         match res {
             Ok(output) => {
                 ui.print_hidden_sub(format!("Declare transaction: {:#x}", output.transaction_hash));
@@ -728,14 +723,8 @@ where
         })
         .collect::<Vec<_>>();
 
-    let InvokeTransactionResult { transaction_hash } = migrator
-        .execute(calls)
-        .fee_estimate_multiplier(
-            txn_config.unwrap_or_default().fee_estimate_multiplier.unwrap_or(2.0),
-        )
-        .send()
-        .await
-        .map_err(|e| {
+    let InvokeTransactionResult { transaction_hash } =
+        world.account.execute(calls).send_with_cfg(txn_config).await.map_err(|e| {
             ui.verbose(format!("{e:?}"));
             anyhow!("Failed to register models to World: {e}")
         })?;
@@ -751,7 +740,7 @@ async fn deploy_dojo_contracts<P, S>(
     strategy: &mut MigrationStrategy,
     migrator: &SingleOwnerAccount<P, S>,
     ui: &Ui,
-    txn_config: Option<TxConfig>,
+    txn_config: &TxnConfig,
 ) -> Result<Vec<Option<ContractMigrationOutput>>>
 where
     P: Provider + Sync + Send + 'static,
@@ -779,7 +768,7 @@ where
                 contract.diff.local_class_hash,
                 contract.diff.base_class_hash,
                 migrator,
-                txn_config.unwrap_or_default(),
+                txn_config,
             )
             .await
         {
@@ -929,7 +918,6 @@ where
 /// # Returns
 /// A [`ResourceData`] object to register in the Dojo resource register
 /// on success.
-///  
 async fn upload_on_ipfs_and_create_resource(
     ui: &Ui,
     element_name: String,
@@ -977,6 +965,7 @@ pub async fn upload_metadata<P, S>(
     ws: &Workspace<'_>,
     migrator: &SingleOwnerAccount<P, S>,
     migration_output: MigrationOutput,
+    txn_config: TxnConfig,
 ) -> Result<()>
 where
     P: Provider + Sync + Send + 'static,
@@ -1050,12 +1039,8 @@ where
 
     let calls = resources.iter().map(|r| world.set_metadata_getcall(r)).collect::<Vec<_>>();
 
-    let InvokeTransactionResult { transaction_hash } = migrator
-        .execute(calls)
-        .fee_estimate_multiplier(2.0) // TODO: Replace hardcoded value here
-        .send()
-        .await
-        .map_err(|e| {
+    let InvokeTransactionResult { transaction_hash } =
+        migrator.execute(calls).send_with_cfg(&txn_config).await.map_err(|e| {
             ui.verbose(format!("{e:?}"));
             anyhow!("Failed to register metadata into the resource registry: {e}")
         })?;
