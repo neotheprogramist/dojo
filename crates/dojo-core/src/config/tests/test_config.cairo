@@ -1,5 +1,5 @@
 use openzeppelin::tests::utils::constants as c;
-use piltover::config::{
+use dojo::config::{
     config_cpt, config_cpt::InternalTrait as ConfigInternal, IConfig, IConfigDispatcherTrait,
     IConfigDispatcher, config_mock
 };

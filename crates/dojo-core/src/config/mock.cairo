@@ -1,8 +1,5 @@
 #[starknet::contract]
 mod config_mock {
-    use openzeppelin::access::ownable::{
-        OwnableComponent as ownable_cpt, OwnableComponent::InternalTrait as OwnableInternal
-    };
     use dojo::config::{config_cpt, config_cpt::InternalTrait as ConfigInternal, IConfig};
     use starknet::ContractAddress;
 
