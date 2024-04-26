@@ -1,19 +1,14 @@
-use std::collections::HashMap;
-use std::str::FromStr;
-
-use super::state_diff::state_updates_to_json_like;
 use katana_primitives::contract::ContractAddress;
 use katana_primitives::state::StateUpdates;
 use katana_primitives::trace::{CallInfo, EntryPointType, TxExecInfo};
 use katana_primitives::transaction::L1HandlerTx;
 use katana_primitives::utils::transaction::compute_l1_message_hash;
 use num_traits::cast::ToPrimitive;
-use serde::{
-    de::Error as DeError, de::SeqAccess, de::Visitor, ser::SerializeSeq, ser::Serializer,
-    Deserializer,
-};
+use serde::{de::Error as DeError, ser::SerializeSeq, ser::Serializer, Deserializer};
 use serde::{Deserialize, Serialize};
 use starknet::core::types::FieldElement;
+use std::collections::HashMap;
+use std::str::FromStr;
 
 /// Based on https://github.com/cartridge-gg/piltover/blob/2be9d46f00c9c71e2217ab74341f77b09f034c81/src/snos_output.cairo#L19-L20
 /// With the new state root computed by the prover.
@@ -132,44 +127,6 @@ pub fn extract_messages(
 }
 
 impl ProgramInput {
-    // pub fn serialize(&self) -> anyhow::Result<String>{
-    //     let message_to_starknet = self
-    //         .message_to_starknet_segment
-    //         .iter()
-    //         .map(MessageToStarknet::serialize)
-    //         .collect::<anyhow::Result<Vec<_>>>()?
-    //         .into_iter()
-    //         .flatten()
-    //         .map(|e| format!("{}", e))
-    //         .collect::<Vec<_>>()
-    //         .join(",");
-    //     let message_to_appchain = self
-    //         .message_to_appchain_segment
-    //         .iter()
-    //         .map(|m| m.serialize())
-    //         .collect::<anyhow::Result<Vec<_>>>()?
-    //         .into_iter()
-    //         .flatten()
-    //         .map(|e| format!("{}", e))
-    //         .collect::<Vec<_>>()
-    //         .join(",");
-
-    //     let mut result = String::from('{');
-    //     result.push_str(&format!(r#""prev_state_root":{},"#, self.prev_state_root));
-    //     result.push_str(&format!(r#""block_number":{},"#, self.block_number));
-    //     result.push_str(&format!(r#""block_hash":{},"#, self.block_hash));
-    //     result.push_str(&format!(r#""config_hash":{},"#, self.config_hash));
-
-    //     result.push_str(&format!(r#""message_to_starknet_segment":[{}],"#, message_to_starknet));
-    //     result.push_str(&format!(r#""message_to_appchain_segment":[{}],"#, message_to_appchain));
-
-    //     result.push_str(&state_updates_to_json_like(&self.state_updates));
-
-    //     result.push_str(&format!("{}", "}"));
-
-    //     Ok(result)
-    // }
-
     pub fn combine(mut self, other: ProgramInput) -> ProgramInput {
         self.message_to_appchain_segment.extend(other.message_to_appchain_segment);
         self.message_to_starknet_segment.extend(other.message_to_starknet_segment);
