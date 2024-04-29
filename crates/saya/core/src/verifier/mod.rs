@@ -30,7 +30,7 @@ pub async fn verify(proof: String, verifier: VerifierIdentifier) -> anyhow::Resu
             let serialized_proof = parse_proof(proof).unwrap();
             starknet::starknet_verify(serialized_proof).await
         }
-        VerifierIdentifier::StoneLocal => crate::prover::local_verify(proof).await,
+        VerifierIdentifier::StoneLocal => crate::prover::local_verify(proof,"piniom/verifier:latest").await,
         VerifierIdentifier::StarkwareEthereum => {
             unimplemented!("Herodotus Starknet not yet supported")
         }
