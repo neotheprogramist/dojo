@@ -375,10 +375,36 @@ fn test_program_input() -> anyhow::Result<()> {
             payload: vec![FieldElement::from_str("112")?],
         }],
         state_updates: StateUpdates {
-            nonce_updates: std::collections::HashMap::new(),
-            storage_updates: std::collections::HashMap::new(),
-            contract_updates: std::collections::HashMap::new(),
-            declared_classes: std::collections::HashMap::new(),
+            nonce_updates: {
+                let mut map = std::collections::HashMap::new();
+                map.insert(
+                    ContractAddress::from(FieldElement::from_str("113")?),
+                    FieldElement::from_str("114")?,
+                );
+                map
+            },
+            storage_updates: {
+                let mut storage_updates = std::collections::HashMap::new();
+                storage_updates.insert(ContractAddress::from(FieldElement::from_str("115")?), {
+                    let mut map = std::collections::HashMap::new();
+                    map.insert(FieldElement::from_str("116")?, FieldElement::from_str("117")?);
+                    map
+                });
+                storage_updates
+            },
+            contract_updates: {
+                let mut map = std::collections::HashMap::new();
+                map.insert(
+                    ContractAddress::from(FieldElement::from_str("118")?),
+                    FieldElement::from_str("119")?,
+                );
+                map
+            },
+            declared_classes: {
+                let mut map = std::collections::HashMap::new();
+                map.insert(FieldElement::from_str("120")?, FieldElement::from_str("121")?);
+                map
+            },
         },
     };
 
@@ -393,10 +419,10 @@ fn test_program_input() -> anyhow::Result<()> {
         "config_hash": 104,
         "message_to_starknet_segment": [105,106,1,107],
         "message_to_appchain_segment": [108,109,110,111,1,112],
-        "nonce_updates": {},
-        "storage_updates": {},
-        "contract_updates": {},
-        "declared_classes": {}
+        "nonce_updates": {"113": "114"},
+        "storage_updates": {"115": {"116": "117"}},
+        "contract_updates": {"118": "119"},
+        "declared_classes": {"120": "121"}
     }"#;
 
     let expected = EXPECTED.chars().filter(|c| !c.is_whitespace()).collect::<String>();
@@ -405,5 +431,73 @@ fn test_program_input() -> anyhow::Result<()> {
 
     assert_eq!(serialized, expected);
 
+    Ok(())
+}
+#[test]
+fn test_from_str_to_program_input() -> anyhow::Result<()> {
+    pub const INPUT: &str = r#"{
+        "prev_state_root": 101,
+        "block_number": 102,
+        "block_hash": 103,
+        "config_hash": 104,
+        "message_to_starknet_segment": [105,106,1,107],
+        "message_to_appchain_segment": [108,109,110,111,1,112],
+        "nonce_updates": {"113": "114"},
+        "storage_updates": {"115": {"116": "117"}},
+        "contract_updates": {"118": "119"},
+        "declared_classes": {"120": "121"}
+    }"#;
+    let expected = ProgramInput {
+        prev_state_root: FieldElement::from_str("101")?,
+        block_number: 102,
+        block_hash: FieldElement::from_str("103")?,
+        config_hash: FieldElement::from_str("104")?,
+        message_to_starknet_segment: vec![MessageToStarknet {
+            from_address: ContractAddress::from(FieldElement::from_str("105")?),
+            to_address: ContractAddress::from(FieldElement::from_str("106")?),
+            payload: vec![FieldElement::from_str("107")?],
+        }],
+        message_to_appchain_segment: vec![MessageToAppchain {
+            from_address: ContractAddress::from(FieldElement::from_str("108")?),
+            to_address: ContractAddress::from(FieldElement::from_str("109")?),
+            nonce: FieldElement::from_str("110")?,
+            selector: FieldElement::from_str("111")?,
+            payload: vec![FieldElement::from_str("112")?],
+        }],
+        state_updates: StateUpdates {
+            nonce_updates: {
+                let mut map = std::collections::HashMap::new();
+                map.insert(
+                    ContractAddress::from(FieldElement::from_str("113")?),
+                    FieldElement::from_str("114")?,
+                );
+                map
+            },
+            storage_updates: {
+                let mut storage_updates = std::collections::HashMap::new();
+                storage_updates.insert(ContractAddress::from(FieldElement::from_str("115")?), {
+                    let mut map = std::collections::HashMap::new();
+                    map.insert(FieldElement::from_str("116")?, FieldElement::from_str("117")?);
+                    map
+                });
+                storage_updates
+            },
+            contract_updates: {
+                let mut map = std::collections::HashMap::new();
+                map.insert(
+                    ContractAddress::from(FieldElement::from_str("118")?),
+                    FieldElement::from_str("119")?,
+                );
+                map
+            },
+            declared_classes: {
+                let mut map = std::collections::HashMap::new();
+                map.insert(FieldElement::from_str("120")?, FieldElement::from_str("121")?);
+                map
+            },
+        },
+    };
+    let deserialized: ProgramInput = serde_json::from_str(INPUT)?;
+    assert_eq!(deserialized, expected);
     Ok(())
 }
