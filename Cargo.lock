@@ -10647,6 +10647,7 @@ dependencies = [
  "katana-rpc-types",
  "lazy_static",
  "num-bigint",
+ "num-traits 0.2.18",
  "parking_lot 0.12.1",
  "rand",
  "reqwest 0.12.4",
@@ -10834,6 +10835,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fbc91545643bcf3a0bbb6569265615222618bdf33ce4ffbbd13c4bbd4c093534"
 dependencies = [
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "scheduler"
+version = "0.7.0-alpha.0"
+dependencies = [
+ "clap",
+ "clap_complete",
+ "katana-primitives",
+ "saya-core",
+ "serde",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
