@@ -5,6 +5,7 @@ members = [
   "bin/dojo-language-server",
   "bin/katana",
   "bin/saya",
+  "bin/scheduler",
   "bin/sozo",
   "bin/torii",
   "crates/benches",
