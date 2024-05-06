@@ -10839,7 +10839,7 @@ dependencies = [
 
 [[package]]
 name = "scheduler"
-version = "0.7.0-alpha.0"
+version = "0.7.0-alpha.3"
 dependencies = [
  "clap",
  "clap_complete",
