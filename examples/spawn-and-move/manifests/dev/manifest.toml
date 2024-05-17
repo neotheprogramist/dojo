@@ -1,17 +1,17 @@
 [world]
 kind = "WorldContract"
-class_hash = "0x301ba8a1a13cec9291b049dea531f73a600e0812908cefa26d17214da411e9c"
-original_class_hash = "0x301ba8a1a13cec9291b049dea531f73a600e0812908cefa26d17214da411e9c"
+class_hash = "0xde1c1a3b141d8cd2f63310effae65848ff855a02e73e676cca02014d7f357a"
+original_class_hash = "0xde1c1a3b141d8cd2f63310effae65848ff855a02e73e676cca02014d7f357a"
 abi = "manifests/dev/abis/deployments/dojo_world_world.json"
-address = "0x3898144a24151443f0c6501a1de46a6e9e27abd9fb5d08cdeeff5a5127d1d25"
-transaction_hash = "0x6c620a196cd78de62d766898b7a1deaf10b428471b5fb525a137d2d06e63490"
+address = "0x5264352c5af2fa8821f16ebf071c249a7ae58b081cf2e7bac3c82d92a8bb6f7"
+transaction_hash = "0x2498ef118f097c08768f89bdb30bfc9b659ad4e789a89681963177dc29d3039"
 block_number = 3
-seed = "dojo_examples"
+seed = "saya-world-v1"
 name = "dojo::world::world"
 
 [world.metadata]
 profile_name = "dev"
-rpc_url = "http://localhost:5050/"
+rpc_url = "http://localhost:5060/"
 
 [base]
 kind = "Class"
@@ -21,10 +21,10 @@ name = "dojo::base::base"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x7361d19c9541e464a15a4cf1aa0d1d155f4982f6ec9bdf6fb6fa1d812ddda9f"
-class_hash = "0x491920188044edfc9bb9ba1d0f989b10e9791d91089a6a98413f5dbf54579cb"
-original_class_hash = "0x491920188044edfc9bb9ba1d0f989b10e9791d91089a6a98413f5dbf54579cb"
-base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
+address = "0x5df12b5a72aaa77a437ae1e4df9964d78fa40a9a0eebb9739b8f17eb3c55bc1"
+class_hash = "0x471a1a36581d24f68ae6984c714daa75d424c0a6581872a65e645eb11a8e45"
+original_class_hash = "0x471a1a36581d24f68ae6984c714daa75d424c0a6581872a65e645eb11a8e45"
+base_class_hash = "0x679177a2cb757694ac4f326d01052ff0963eac0bc2a17116a2b87badcdf6f76"
 abi = "manifests/dev/abis/deployments/contracts/dojo_examples_actions_actions.json"
 reads = []
 writes = [
