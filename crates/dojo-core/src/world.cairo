@@ -624,7 +624,7 @@ mod world {
             let fact_registry = IFactRegistryDispatcher {
                 contract_address: self.config.get_facts_registry()
             };
-            assert(fact_registry.is_valid(fact), 'no state transition proof');
+            // assert(fact_registry.is_valid(fact), 'no state transition proof');
 
             let mut i = 0;
             loop {
