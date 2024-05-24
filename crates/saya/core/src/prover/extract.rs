@@ -5,8 +5,8 @@ use katana_primitives::{contract::ContractAddress, FieldElement};
 use num_traits::ToPrimitive;
 
 pub fn program_input_from_program_output(
-    _output: Vec<FieldElement>,
-    _state_updates: StateUpdates,
+    output: Vec<FieldElement>,
+    state_updates: StateUpdates,
 ) -> anyhow::Result<ProgramInput> {
     // println!("{:?}", serde_json::to_string(&output).unwrap());
     // let prev_state_root = output[0].clone();
@@ -40,7 +40,17 @@ pub fn program_input_from_program_output(
     //     }
     // }
 
-    let mut input = ProgramInput { ..Default::default() };
+    let mut input = ProgramInput {
+        //     prev_state_root: output[0],
+        //     block_number,
+        //     block_hash,
+        //     config_hash,
+        //     message_to_starknet_segment,
+        //     message_to_appchain_segment,
+        //     state_updates,
+        //     world_da: None,
+        ..Default::default()
+    };
 
     input.fill_da(FieldElement::default()); // TODO: pass contract address to function
     Ok(input)

@@ -316,11 +316,11 @@ impl Saya {
         // .await?;
         // info!(target: LOG_TARGET, last_block, transaction_hash, "Block verified.");
 
-        // let ExtractProgramResult { program: _, program_hash } = extract_program(&proof)?;
-        // println!("Program hash: {}", program_hash);
-        // let ExtractOutputResult { program_output, program_output_hash } = extract_output(&proof)?;
-        // let expected_fact = poseidon_hash_many(&[program_hash, program_output_hash]).to_string();
-        // info!(target: LOG_TARGET, expected_fact, "Expected fact.");
+        let ExtractProgramResult { program: _, program_hash } = extract_program(&proof)?;
+        println!("Program hash: {:x}", program_hash);
+        let ExtractOutputResult { program_output, program_output_hash } = extract_output(&proof)?;
+        let expected_fact = poseidon_hash_many(&[program_hash, program_output_hash]).to_string();
+        info!(target: LOG_TARGET, expected_fact, "Expected fact.");
 
         // sleep(Duration::from_millis(5000)).await;
 
