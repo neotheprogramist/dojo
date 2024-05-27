@@ -1,17 +1,17 @@
 [world]
 kind = "WorldContract"
-class_hash = "0x301ba8a1a13cec9291b049dea531f73a600e0812908cefa26d17214da411e9c"
-original_class_hash = "0x301ba8a1a13cec9291b049dea531f73a600e0812908cefa26d17214da411e9c"
+class_hash = "0x6ceaf14e9f17e51b13d205f8d55913ea03a7534b7a067cb941adf2e577868e3"
+original_class_hash = "0x6ceaf14e9f17e51b13d205f8d55913ea03a7534b7a067cb941adf2e577868e3"
 abi = "manifests/dev/abis/deployments/dojo_world_world.json"
-address = "0x3898144a24151443f0c6501a1de46a6e9e27abd9fb5d08cdeeff5a5127d1d25"
-transaction_hash = "0x6c620a196cd78de62d766898b7a1deaf10b428471b5fb525a137d2d06e63490"
+address = "0x6294528d1139adb3bd42e831693e41d740dbd206b43ce956661a3b323c5bf2b"
+transaction_hash = "0x71f62320aba0cedd68ba8ca7114d9344edf647c2ecacc62307d479954d3e34b"
 block_number = 3
-seed = "dojo_examples"
+seed = "mateo-saya-v017"
 name = "dojo::world::world"
 
 [world.metadata]
 profile_name = "dev"
-rpc_url = "http://localhost:5050/"
+rpc_url = "https://starknet-sepolia.g.alchemy.com/v2/PovJ0plog8O9RxyaPMYAZiKHqZ5LLII_"
 
 [base]
 kind = "Class"
@@ -21,7 +21,7 @@ name = "dojo::base::base"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x7361d19c9541e464a15a4cf1aa0d1d155f4982f6ec9bdf6fb6fa1d812ddda9f"
+address = "0x30e8703bfba22146517edc6ac46ab884890c98506a0df84301b23dfef2afc4c"
 class_hash = "0x491920188044edfc9bb9ba1d0f989b10e9791d91089a6a98413f5dbf54579cb"
 original_class_hash = "0x491920188044edfc9bb9ba1d0f989b10e9791d91089a6a98413f5dbf54579cb"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"

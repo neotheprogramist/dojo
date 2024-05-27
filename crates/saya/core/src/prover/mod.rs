@@ -7,34 +7,50 @@ use anyhow::bail;
 use async_trait::async_trait;
 
 mod client;
+mod extract;
 mod program_input;
+mod scheduler;
 pub mod state_diff;
 mod stone_image;
 mod vec252;
 
+pub use client::HttpProverParams;
 pub use program_input::*;
-use serde::{Deserialize, Serialize};
+pub use scheduler::*;
 pub use stone_image::*;
-use url::Url;
 
 use self::client::http_prove;
 
 /// The prover used to generate the proof.
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum ProverIdentifier {
     #[default]
     Stone,
     Sharp,
     Platinum,
-    Http(Url),
+    Http(Box<HttpProverParams>),
 }
 
-pub async fn prove(input: String, prover: ProverIdentifier) -> anyhow::Result<String> {
+pub enum ProveProgram {
+    Differ,
+    Merger,
+}
+
+pub async fn prove_diff(input: String, prover: ProverIdentifier) -> anyhow::Result<String> {
     match prover {
+        ProverIdentifier::Http(params) => http_prove(*params, input, ProveProgram::Differ).await,
+        ProverIdentifier::Stone => prove_stone(input).await,
         ProverIdentifier::Sharp => todo!(),
-        ProverIdentifier::Stone => todo!(),
         ProverIdentifier::Platinum => todo!(),
-        ProverIdentifier::Http(prover_url) => http_prove(prover_url, input).await,
+    }
+}
+
+pub async fn prove_merge(input: String, prover: ProverIdentifier) -> anyhow::Result<String> {
+    match prover {
+        ProverIdentifier::Http(params) => http_prove(*params, input, ProveProgram::Merger).await,
+        ProverIdentifier::Stone => prove_merge_stone(input).await,
+        ProverIdentifier::Sharp => todo!(),
+        ProverIdentifier::Platinum => todo!(),
     }
 }
 
