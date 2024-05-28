@@ -7,7 +7,7 @@ version = "0.6.0"
 edition = "2023_10"
 
 [cairo]
-sierra-replace-ids = trues
+sierra-replace-ids = true
 
 [dependencies]
 dojo = { path = "../../crates/dojo-core" }
