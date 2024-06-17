@@ -1,0 +1,151 @@
+[world]
+kind = "WorldContract"
+class_hash = "0x3f63cecdc4964acafb921ba2934c6507d1b3c344edb64c2762cf08053169ab9"
+original_class_hash = "0x3f63cecdc4964acafb921ba2934c6507d1b3c344edb64c2762cf08053169ab9"
+abi = "manifests/dev/abis/deployments/dojo_world_world.json"
+address = "0x29f3862ce687019943e612e0ee1e23a03b39ac0b1b065880d8da8694a50b6a7"
+transaction_hash = "0x2201936eea973894ae712a34275be275a17930c4afa0381ef6c491800b70b5f"
+block_number = 3
+seed = "benches"
+name = "dojo::world::world"
+
+[world.metadata]
+profile_name = "dev"
+rpc_url = "http://localhost:5050/"
+
+[base]
+kind = "Class"
+class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
+original_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
+name = "dojo::base::base"
+
+[[contracts]]
+kind = "DojoContract"
+address = "0x671ebce51a0599c2b0e76bea34ab4cd753658fd4b05a18b725e4214ef714dae"
+class_hash = "0x78666d734b098146baa89f9ff388d0019344ddb656756c9d8601fd03d0401dd"
+original_class_hash = "0x78666d734b098146baa89f9ff388d0019344ddb656756c9d8601fd03d0401dd"
+base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
+abi = "manifests/dev/abis/deployments/contracts/benches_systems_actions_actions.json"
+reads = []
+writes = [
+    "Moves",
+    "Position",
+]
+computed = []
+init_calldata = []
+name = "benches::systems::actions::actions"
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x2820db81469c45e3da4c15946cdda766d05e076df742b53ad9c4b1f7d819dcc"
+original_class_hash = "0x2820db81469c45e3da4c15946cdda766d05e076df742b53ad9c4b1f7d819dcc"
+abi = "manifests/dev/abis/deployments/models/benches_models_character_alias.json"
+name = "benches::models::character::alias"
+
+[[models.members]]
+name = "player"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "name"
+type = "felt252"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x725bd32ce2a336c3b4549859e8aba7a1568120eb50e85cc69934db730cb58f3"
+original_class_hash = "0x725bd32ce2a336c3b4549859e8aba7a1568120eb50e85cc69934db730cb58f3"
+abi = "manifests/dev/abis/deployments/models/benches_models_character_case.json"
+name = "benches::models::character::case"
+
+[[models.members]]
+name = "owner"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "sword"
+type = "Sword"
+key = false
+
+[[models.members]]
+name = "material"
+type = "felt252"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0xb70da4b2d258137605052557f35f07c7b2d2b779c97ede0f6160985797cecc"
+original_class_hash = "0xb70da4b2d258137605052557f35f07c7b2d2b779c97ede0f6160985797cecc"
+abi = "manifests/dev/abis/deployments/models/benches_models_character_character.json"
+name = "benches::models::character::character"
+
+[[models.members]]
+name = "caller"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "heigth"
+type = "felt252"
+key = false
+
+[[models.members]]
+name = "abilities"
+type = "Abilities"
+key = false
+
+[[models.members]]
+name = "stats"
+type = "Stats"
+key = false
+
+[[models.members]]
+name = "weapon"
+type = "Weapon"
+key = false
+
+[[models.members]]
+name = "gold"
+type = "u32"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x21d3b04c49dc164e9fd8d59c74387a24267cc5ba9639ad649f7af6729b8656c"
+original_class_hash = "0x21d3b04c49dc164e9fd8d59c74387a24267cc5ba9639ad649f7af6729b8656c"
+abi = "manifests/dev/abis/deployments/models/benches_models_moves_moves.json"
+name = "benches::models::moves::moves"
+
+[[models.members]]
+name = "player"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "remaining"
+type = "u32"
+key = false
+
+[[models.members]]
+name = "last_direction"
+type = "Direction"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x7fdf5250fbe4d939fec0ffe93f7c8e82763894e6c9c7aeb195d74ced36c9a5c"
+original_class_hash = "0x7fdf5250fbe4d939fec0ffe93f7c8e82763894e6c9c7aeb195d74ced36c9a5c"
+abi = "manifests/dev/abis/deployments/models/benches_models_position_position.json"
+name = "benches::models::position::position"
+
+[[models.members]]
+name = "player"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "vec"
+type = "Vec2"
+key = false

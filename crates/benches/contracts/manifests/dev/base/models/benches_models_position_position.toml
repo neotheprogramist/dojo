@@ -1,0 +1,15 @@
+kind = "DojoModel"
+class_hash = "0x7fdf5250fbe4d939fec0ffe93f7c8e82763894e6c9c7aeb195d74ced36c9a5c"
+original_class_hash = "0x7fdf5250fbe4d939fec0ffe93f7c8e82763894e6c9c7aeb195d74ced36c9a5c"
+abi = "manifests/dev/abis/base/models/benches_models_position_position.json"
+name = "benches::models::position::position"
+
+[[members]]
+name = "player"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "vec"
+type = "Vec2"
+key = false

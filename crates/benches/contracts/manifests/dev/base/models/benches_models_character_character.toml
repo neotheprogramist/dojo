@@ -1,0 +1,35 @@
+kind = "DojoModel"
+class_hash = "0xb70da4b2d258137605052557f35f07c7b2d2b779c97ede0f6160985797cecc"
+original_class_hash = "0xb70da4b2d258137605052557f35f07c7b2d2b779c97ede0f6160985797cecc"
+abi = "manifests/dev/abis/base/models/benches_models_character_character.json"
+name = "benches::models::character::character"
+
+[[members]]
+name = "caller"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "heigth"
+type = "felt252"
+key = false
+
+[[members]]
+name = "abilities"
+type = "Abilities"
+key = false
+
+[[members]]
+name = "stats"
+type = "Stats"
+key = false
+
+[[members]]
+name = "weapon"
+type = "Weapon"
+key = false
+
+[[members]]
+name = "gold"
+type = "u32"
+key = false

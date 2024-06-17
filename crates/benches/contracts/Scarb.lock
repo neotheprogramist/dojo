@@ -10,8 +10,8 @@ dependencies = [
 
 [[package]]
 name = "dojo"
-version = "0.4.4"
-source = "git+https://github.com/dojoengine/dojo#37f41d585f549013a73ca189034b0471f1e81731"
+version = "0.7.0"
+source = "git+https://github.com/dojoengine/dojo#70ad72826df84cef73368cb38abda3d4715548dd"
 dependencies = [
  "dojo_plugin",
 ]

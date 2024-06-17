@@ -1,0 +1,20 @@
+kind = "DojoModel"
+class_hash = "0x725bd32ce2a336c3b4549859e8aba7a1568120eb50e85cc69934db730cb58f3"
+original_class_hash = "0x725bd32ce2a336c3b4549859e8aba7a1568120eb50e85cc69934db730cb58f3"
+abi = "manifests/dev/abis/base/models/benches_models_character_case.json"
+name = "benches::models::character::case"
+
+[[members]]
+name = "owner"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "sword"
+type = "Sword"
+key = false
+
+[[members]]
+name = "material"
+type = "felt252"
+key = false

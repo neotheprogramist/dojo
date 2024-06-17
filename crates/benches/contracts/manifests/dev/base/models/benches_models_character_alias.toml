@@ -1,0 +1,15 @@
+kind = "DojoModel"
+class_hash = "0x2820db81469c45e3da4c15946cdda766d05e076df742b53ad9c4b1f7d819dcc"
+original_class_hash = "0x2820db81469c45e3da4c15946cdda766d05e076df742b53ad9c4b1f7d819dcc"
+abi = "manifests/dev/abis/base/models/benches_models_character_alias.json"
+name = "benches::models::character::alias"
+
+[[members]]
+name = "player"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "name"
+type = "felt252"
+key = false
