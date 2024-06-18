@@ -1005,7 +1005,7 @@
     "seed": "benches",
     "metadata": {
       "profile_name": "dev",
-      "rpc_url": "http://localhost:5050/"
+      "rpc_url": "http://127.0.0.1:49682/"
     },
     "name": "dojo::world::world"
   },

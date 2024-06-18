@@ -100,7 +100,7 @@ async fn prepare_migration_args(args: SozoArgs) -> Result<FieldElement> {
     let manifest_dir = manifest_path.parent().unwrap();
 
     let manifest = DeploymentManifest::load_from_path(
-        &manifest_dir.join(MANIFESTS_DIR).join("dev").join(DEPLOYMENTS_DIR).with_extension("toml"),
+        &manifest_dir.join(MANIFESTS_DIR).join("dev").join("manifest").with_extension("toml"),
     )
     .expect("failed to load manifest");
 
