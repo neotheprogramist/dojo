@@ -95,7 +95,7 @@ async fn prepare_migration_args(args: SozoArgs) -> Result<FieldElement> {
         _ => return Err(anyhow!("failed to parse migrate args")),
     };
 
-    migrate.run(&config)?;
+    migrate.run(&config).await?;
 
     let manifest_dir = manifest_path.parent().unwrap();
 
