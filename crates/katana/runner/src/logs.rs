@@ -28,11 +28,18 @@ pub struct MinedMessage {
     tx_count: String,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UsageMessage {
+    message: String,
+    usage: String,
+}
+
 pub type MinedLog = TimedLog<MinedMessage>;
+pub type UsageLog = TimedLog<UsageMessage>;
 
 impl KatanaRunner {
     pub fn blocks(&self) -> Vec<MinedLog> {
-        BufReader::new(File::open(dbg!(&self.log_file_path)).unwrap())
+        BufReader::new(File::open(&self.log_file_path).unwrap())
             .lines()
             .map_while(Result::ok)
             .filter_map(|line| match serde_json::from_str(&line) {
@@ -69,11 +76,11 @@ impl KatanaRunner {
             .await
             .into_iter()
             .map(|block| {
-                dbg!(block
+                block
                     .fields
                     .tx_count
                     .parse::<u32>()
-                    .expect("Failed to parse number of transactions"))
+                    .expect("Failed to parse number of transactions")
             })
             .collect()
     }
@@ -95,11 +102,12 @@ impl KatanaRunner {
     }
 
     pub async fn steps(&self) -> Vec<u64> {
-        let matching = "Transaction resource usage: Steps: ";
+        let matching = "Steps: ";
         BufReader::new(File::open(&self.log_file_path).unwrap())
             .lines()
-            .filter_map(|line| {
-                let line = line.unwrap();
+            .filter_map(|line| serde_json::from_str::<UsageLog>(&line.unwrap()).ok())
+            .filter_map(|log| {
+                let line = log.fields.usage;
                 if let Some(start) = line.find(matching) {
                     let end = line.find(" | ");
                     let steps = line[start + matching.len()..end.unwrap()].to_string();
@@ -117,5 +125,12 @@ impl KatanaRunner {
 fn test_parse_katana_logs() {
     let log = r#"{"timestamp":"2024-06-18T16:51:49.139195Z","level":"INFO","fields":{"message":"Block mined.","block_number":"1","tx_count":"1"},"target":"katana::core::backend"}"#;
     let log: MinedLog = serde_json::from_str(log).unwrap();
+    assert_eq!(log.fields.message, "⛏️ Block 45 mined with 0 transactions");
+}
+
+#[test]
+fn test_parse_katana_usage_logs() {
+    let log = r#"{"timestamp":"2024-06-19T09:11:56.406990Z","level":"TRACE","fields":{"message":"Transaction resource usage.","usage":"Steps: 3513 | Ec Op Builtin: 3 | L 1 Blob Gas Usage: 0 | L1 Gas: 8063 | Pedersen: 16 | Range Checks: 75"},"target":"executor"}"#;
+    let log: UsageLog = serde_json::from_str(log).unwrap();
     assert_eq!(log.fields.message, "⛏️ Block 45 mined with 0 transactions");
 }
