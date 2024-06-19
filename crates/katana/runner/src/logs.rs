@@ -125,12 +125,19 @@ impl KatanaRunner {
 fn test_parse_katana_logs() {
     let log = r#"{"timestamp":"2024-06-18T16:51:49.139195Z","level":"INFO","fields":{"message":"Block mined.","block_number":"1","tx_count":"1"},"target":"katana::core::backend"}"#;
     let log: MinedLog = serde_json::from_str(log).unwrap();
-    assert_eq!(log.fields.message, "⛏️ Block 45 mined with 0 transactions");
+    assert_eq!(log.fields.message, "Block mined.");
+    assert_eq!(log.fields.tx_count, "1");
+    assert_eq!(log.fields.block_number, "1");
 }
 
 #[test]
 fn test_parse_katana_usage_logs() {
     let log = r#"{"timestamp":"2024-06-19T09:11:56.406990Z","level":"TRACE","fields":{"message":"Transaction resource usage.","usage":"Steps: 3513 | Ec Op Builtin: 3 | L 1 Blob Gas Usage: 0 | L1 Gas: 8063 | Pedersen: 16 | Range Checks: 75"},"target":"executor"}"#;
     let log: UsageLog = serde_json::from_str(log).unwrap();
-    assert_eq!(log.fields.message, "⛏️ Block 45 mined with 0 transactions");
+    assert_eq!(log.fields.message, "Transaction resource usage.");
+    assert_eq!(
+        log.fields.usage,
+        "Steps: 3513 | Ec Op Builtin: 3 | L 1 Blob Gas Usage: 0 | L1 Gas: 8063 | Pedersen: 16 | \
+         Range Checks: 75"
+    );
 }

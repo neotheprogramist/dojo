@@ -123,7 +123,7 @@ impl KatanaRunner {
 
         let (sender, receiver) = mpsc::channel();
         thread::spawn(move || {
-            utils::wait_for_server_started_and_signal(&dbg!(log_file_path_sent), stdout, sender);
+            utils::wait_for_server_started_and_signal(&log_file_path_sent, stdout, sender);
         });
 
         receiver
@@ -198,11 +198,7 @@ impl Drop for KatanaRunner {
 /// Determines the default program path for the katana runner based on the KATANA_RUNNER_BIN
 /// environment variable. If not set, try to to use katana from the PATH.
 fn determine_default_program_path() -> String {
-    if let Ok(bin) = std::env::var("KATANA_RUNNER_BIN") {
-        bin
-    } else {
-        "katana".to_string()
-    }
+    if let Ok(bin) = std::env::var("KATANA_RUNNER_BIN") { bin } else { "katana".to_string() }
 }
 
 #[cfg(test)]

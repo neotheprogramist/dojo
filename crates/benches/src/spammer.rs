@@ -109,7 +109,7 @@ pub async fn spam_katana(
         _ => durations.last().unwrap().as_millis() - durations.first().unwrap().as_millis(),
     } as u64;
 
-    let block_sizes: Vec<u32> = runner.block_sizes().await;
+    let block_sizes = runner.block_sizes().await;
     let transaction_sum = block_sizes.iter().sum::<u32>() - transaction_sum_before;
     assert_eq!(transaction_sum as usize, expected_transactions);
 

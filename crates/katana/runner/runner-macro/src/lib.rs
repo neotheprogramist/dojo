@@ -28,11 +28,7 @@ fn parse_metadata(metadata: String) -> (u16, Option<String>, Option<u64>) {
     // if set to `true`, we use a default block time.
     let block_time = if args.len() >= 2 {
         if let Ok(b) = args[1].trim().parse::<bool>() {
-            if !b {
-                None
-            } else {
-                Some(DEFAULT_BLOCK_TIME)
-            }
+            if !b { None } else { Some(DEFAULT_BLOCK_TIME) }
         } else if let Ok(block_time_ms) = args[1].trim().parse::<u64>() {
             Some(block_time_ms)
         } else {
@@ -100,7 +96,7 @@ pub fn runner(metadata: TokenStream) -> TokenStream {
     let mut args = metadata.split(',').collect::<Vec<&str>>();
     let function_name = args.remove(0);
 
-    let (n_accounts, executable, block_time) = parse_metadata(dbg!(args.join(",")));
+    let (n_accounts, executable, block_time) = parse_metadata(args.join(","));
 
     let block_time = block_time.map(|b| quote!(Some(#b))).unwrap_or(quote!(None));
 
