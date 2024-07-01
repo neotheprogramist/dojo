@@ -24,11 +24,12 @@ use starknet::signers::{LocalWallet, SigningKey};
 use tokio::time::sleep;
 use url::Url;
 // will need to be read from the environment for chains other than sepoia
-pub const STARKNET_URL: &str = "https://free-rpc.nethermind.io/sepolia-juno/v0_7";
+pub const STARKNET_URL: &str =
+    "https://starknet-sepolia.g.alchemy.com/v2/PovJ0plog8O9RxyaPMYAZiKHqZ5LLII_";
 pub const CHAIN_ID: &str = "0x00000000000000000000000000000000000000000000534e5f5345504f4c4941";
 pub const SIGNER_ADDRESS: &str =
-    "0x00ceE714eAF27390e630c62aa4b51319f9EdA813d6DDd12dA0ae8Ce00453cb4b";
-pub const SIGNER_KEY: &str = "0x01c49f9a0f5d2ca87fe7bb0530c611f91faf4adda6b7fcff479ce92ea13b1b4c";
+    "0x0566eD97787e5C0ee5F6085Ec22Cea5596B0018EC89739c7c64E7C5BeD7f0319";
+pub const SIGNER_KEY: &str = "0x021f655cf5f523e54b80014fb61710362677e6ec07d1415fb6d4bd61faa5147d";
 
 lazy_static::lazy_static!(
     pub static ref STARKNET_ACCOUNT: SingleOwnerAccount<JsonRpcClient<HttpTransport>, LocalWallet> = {
