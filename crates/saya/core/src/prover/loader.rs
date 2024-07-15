@@ -24,8 +24,8 @@ pub async fn prepare_input_cairo(
 ) -> anyhow::Result<Cairo1ProverInput> {
     let program = load_program().await?;
 
-    //let data = vec!["[1 0 0 7 1 563518697563542123606888854620392365504900406918881341246086066801626937907 1259008560618804745770255768445176861078101720763151456759359170279920395577 3 0 469786453359 5]"];
-    let program_input: Value = serde_json::from_str(&serde_json::to_string(&arguments)?)?;
+    let data = vec![arguments];
+    let program_input: Value = serde_json::from_str(&serde_json::to_string(&data)?)?;
 
     Ok(Cairo1ProverInput {
         program,
