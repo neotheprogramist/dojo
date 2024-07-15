@@ -7,9 +7,8 @@ use katana_primitives::FieldElement;
 use tokio::sync::{mpsc, oneshot};
 use tracing::{info, trace};
 
-use super::{prove_diff, ProgramInput, ProverIdentifier};
+use super::{prove_diff, ProgramInput, ProgramInputV2, ProverIdentifier};
 use crate::prover::extract::program_input_from_program_output;
-use crate::prover::ProveProgram;
 use crate::LOG_TARGET;
 
 type Proof = String;
@@ -22,11 +21,11 @@ pub enum ProvingState {
 }
 
 type ProvingStateWithBlock = (u64, ProvingState);
-pub type ProofAndDiff = (Proof, ProgramInput, (u64, u64));
+pub type ProofAndDiff = (Proof, (u64, u64));
 
 pub struct Scheduler {
-    root_task: BoxFuture<'static, anyhow::Result<(Proof, ProgramInput)>>,
-    free_differs: Vec<oneshot::Sender<ProgramInput>>,
+    root_task: BoxFuture<'static, anyhow::Result<Proof>>,
+    free_differs: Vec<oneshot::Sender<ProgramInputV2>>,
     proving_tasks: Vec<ProvingStateWithBlock>,
     update_channel: mpsc::Receiver<ProvingStateWithBlock>,
     block_range: (u64, u64),
@@ -35,7 +34,7 @@ pub struct Scheduler {
 impl Scheduler {
     pub fn new(capacity: usize, world: FieldElement, prover: ProverIdentifier) -> Self {
         let (senders, receivers): (Vec<_>, Vec<_>) =
-            (0..capacity).map(|_| oneshot::channel::<ProgramInput>()).unzip();
+            (0..capacity).map(|_| oneshot::channel::<ProgramInputV2>()).unzip();
 
         let (update_sender, update_channel) = mpsc::channel(capacity * 2);
         let root_task = prove_recursively(receivers, world, prover, update_sender);
@@ -53,7 +52,7 @@ impl Scheduler {
         self.free_differs.is_empty()
     }
 
-    pub fn push_diff(&mut self, input: ProgramInput) -> anyhow::Result<()> {
+    pub fn push_diff(&mut self, input: ProgramInputV2) -> anyhow::Result<()> {
         if self.is_full() {
             bail!("Scheduler is full");
         }
@@ -72,15 +71,15 @@ impl Scheduler {
     }
 
     pub async fn proved(self) -> anyhow::Result<ProofAndDiff> {
-        let (proof, input) = self.root_task.await?;
-        Ok((proof, input, self.block_range))
+        let (proof) = self.root_task.await?;
+        Ok((proof, self.block_range))
     }
 
     pub async fn merge(
-        inputs: Vec<ProgramInput>,
+        inputs: Vec<ProgramInputV2>,
         world: FieldElement,
         prover: ProverIdentifier,
-    ) -> anyhow::Result<(Proof, ProgramInput)> {
+    ) -> anyhow::Result<Proof> {
         let mut scheduler = Scheduler::new(inputs.len(), world, prover);
         let number_of_inputs = inputs.len();
         trace!(target: LOG_TARGET, number_of_inputs, "Pushing inputs to scheduler");
@@ -88,8 +87,8 @@ impl Scheduler {
             scheduler.push_diff(input)?;
         }
         info!(target: LOG_TARGET, number_of_inputs, "inputs pushed to scheduler");
-        let (merged_proof, merged_input, _) = scheduler.proved().await?;
-        Ok((merged_proof, merged_input))
+        let (merged_proof, _) = scheduler.proved().await?;
+        Ok(merged_proof)
     }
 
     pub async fn query(&mut self, block_number: u64) -> anyhow::Result<ProvingState> {
@@ -154,7 +153,7 @@ async fn combine_proofs(
     let prover_input =
         serde_json::to_string(&CombinedInputs { earlier: earlier_input, later: later_input })?;
 
-    let merged_proof = prove_diff(prover_input, prover, ProveProgram::Merger).await?;
+    let merged_proof = prove_diff(prover_input, prover).await?;
 
     Ok(merged_proof)
 }
@@ -164,60 +163,26 @@ async fn combine_proofs(
 /// It returns a BoxFuture to allow for dynamic dispatch of futures, useful in recursive async
 /// calls.
 fn prove_recursively(
-    mut inputs: Vec<oneshot::Receiver<ProgramInput>>,
-    world: FieldElement,
+    mut inputs: Vec<oneshot::Receiver<ProgramInputV2>>,
+    _world: FieldElement,
     prover: ProverIdentifier,
     update_channel: mpsc::Sender<(u64, ProvingState)>,
-) -> BoxFuture<'static, anyhow::Result<(Proof, ProgramInput)>> {
+) -> BoxFuture<'static, anyhow::Result<Proof>> {
     let handle = tokio::spawn(async move {
-        if inputs.len() == 1 {
-            let mut input = inputs.pop().unwrap().await.unwrap();
-            input.fill_da(world);
-            let block_number = input.block_number;
-            trace!(target: LOG_TARGET, block_number, "Proving block");
-            update_channel.send((block_number, ProvingState::Proving)).await.unwrap();
+        let input = inputs.pop().unwrap().await.unwrap();
 
-            let prover_input = serde_json::to_string(&input.clone()).unwrap();
-            let proof = prove_diff(prover_input, prover, ProveProgram::Differ).await?;
+        let block_number = input.block_number;
 
-            info!(target: LOG_TARGET, block_number, "Block proven");
-            update_channel.send((block_number, ProvingState::Proved)).await.unwrap();
-            Ok((proof, input))
-        } else {
-            let proof_count = inputs.len();
-            let last = inputs.split_off(proof_count / 2);
+        trace!(target: LOG_TARGET, block_number, "Proving block");
+        update_channel.send((block_number, ProvingState::Proving)).await.unwrap();
 
-            let provers = (prover.clone(), prover.clone());
+        let prover_input = ProgramInputV2::prepare_differ_args(vec![input]);
+        let proof = prove_diff(prover_input, prover).await?;
 
-            let second_update_sender = update_channel.clone();
-            let (earlier_result, later_result) = tokio::try_join!(
-                tokio::spawn(async move {
-                    prove_recursively(inputs, world, provers.0, update_channel).await
-                }),
-                tokio::spawn(async move {
-                    prove_recursively(last, world, provers.1, second_update_sender).await
-                }),
-            )?;
-
-            let ((earlier_result, earlier_input), (later_result, later_input)) =
-                (earlier_result?, later_result?);
-
-            let input = earlier_input.clone().combine(later_input.clone())?;
-            let merged_proofs = combine_proofs(
-                earlier_result,
-                later_result,
-                prover,
-                earlier_input.state_updates,
-                later_input.state_updates,
-                world,
-                proof_count,
-            )
-            .await?;
-
-            let first_proven = earlier_input.block_number;
-            info!(target: LOG_TARGET, first_proven, proof_count, "Merged proofs");
-            Ok((merged_proofs, input))
-        }
+        info!(target: LOG_TARGET, block_number, "Block proven");
+        update_channel.send((block_number, ProvingState::Proved)).await.unwrap();
+            
+        Ok(proof)
     });
 
     async move { handle.await? }.boxed()

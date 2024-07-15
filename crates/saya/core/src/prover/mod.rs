@@ -11,6 +11,7 @@ mod client;
 pub mod extract;
 mod loader;
 mod program_input;
+mod program_inputs_v2;
 mod scheduler;
 pub mod state_diff;
 mod stone_image;
@@ -20,6 +21,7 @@ pub use client::HttpProverParams;
 pub use program_input::*;
 pub use scheduler::*;
 pub use stone_image::*;
+pub use program_inputs_v2::*;
 
 use self::client::http_prove;
 
@@ -40,12 +42,11 @@ pub enum ProveProgram {
 
 pub async fn prove_diff(
     input: String,
-    prover: ProverIdentifier,
-    program: ProveProgram,
+    prover: ProverIdentifier
 ) -> anyhow::Result<String> {
     match prover {
-        ProverIdentifier::Http(params) => http_prove(params, input, program).await,
-        ProverIdentifier::Stone => prove_stone(input, program).await,
+        ProverIdentifier::Http(params) => http_prove(params, input).await,
+        ProverIdentifier::Stone => prove_stone(input).await,
         ProverIdentifier::Sharp => todo!(),
         ProverIdentifier::Platinum => todo!(),
     }
