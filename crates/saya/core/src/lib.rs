@@ -49,6 +49,7 @@ pub struct SayaConfig {
     pub katana_rpc: Url,
     #[serde(deserialize_with = "url_deserializer")]
     pub url: Url,
+    pub mode: SayaMode,
     pub private_key: ProverAccessKey,
     pub store_proofs: bool,
     pub block_range: (u64, Option<u64>),
@@ -87,6 +88,13 @@ struct FetchedBlockInfo {
     prev_state_root: FieldElement,
     state_updates: StateUpdatesWithDeclaredClasses,
     exec_infos: Vec<TxExecutionInfo>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum SayaMode {
+    Ephemeral,
+    Persistent,
+    PersistentMerging,
 }
 
 impl Saya {
