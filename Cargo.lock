@@ -3276,15 +3276,17 @@ dependencies = [
 
 [[package]]
 name = "cairo-proof-parser"
-version = "0.3.0"
-source = "git+https://github.com/cartridge-gg/cairo-proof-parser?tag=v0.3.0#1cd7af307609d0f6a602a59d124d5044e56cc7b4"
+version = "0.1.0"
+source = "git+https://github.com/cartridge-gg/cairo-proof-parser?rev=3b6e874578e0a695d30d6b84750a4bcf03326582#3b6e874578e0a695d30d6b84750a4bcf03326582"
 dependencies = [
  "anyhow",
  "clap",
  "itertools 0.12.1",
  "num-bigint",
+ "prefix-hex",
  "regex",
  "serde",
+ "serde-felt",
  "serde_json",
  "starknet",
  "starknet-crypto 0.6.2",
@@ -3765,7 +3767,7 @@ dependencies = [
 [[package]]
 name = "common"
 version = "0.1.0"
-source = "git+https://github.com/neotheprogramist/http-prover?rev=05aa9dbb7fdd5618693cead978d4ab0eebbf8f80#05aa9dbb7fdd5618693cead978d4ab0eebbf8f80"
+source = "git+https://github.com/neotheprogramist/http-prover?rev=253190d350aba1afb497f6c1e3a31016cff79547#253190d350aba1afb497f6c1e3a31016cff79547"
 dependencies = [
  "ed25519-dalek",
  "prefix-hex",
@@ -10762,7 +10764,7 @@ dependencies = [
 [[package]]
 name = "prover-sdk"
 version = "0.1.0"
-source = "git+https://github.com/neotheprogramist/http-prover?rev=05aa9dbb7fdd5618693cead978d4ab0eebbf8f80#05aa9dbb7fdd5618693cead978d4ab0eebbf8f80"
+source = "git+https://github.com/neotheprogramist/http-prover?rev=253190d350aba1afb497f6c1e3a31016cff79547#253190d350aba1afb497f6c1e3a31016cff79547"
 dependencies = [
  "bytes",
  "common 0.1.0",
@@ -12226,6 +12228,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "226b61a0d411b2ba5ff6d7f73a476ac4f8bb900373459cd00fab8512828ba395"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-felt"
+version = "0.1.0"
+source = "git+https://github.com/cartridge-gg/cairo-proof-parser?rev=3b6e874578e0a695d30d6b84750a4bcf03326582#3b6e874578e0a695d30d6b84750a4bcf03326582"
+dependencies = [
+ "serde",
+ "starknet-crypto 0.6.2",
+ "starknet-ff",
 ]
 
 [[package]]
