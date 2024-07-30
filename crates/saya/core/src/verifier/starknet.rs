@@ -1,20 +1,15 @@
-use std::time::Duration;
-
 use anyhow::Context;
 use dojo_world::migration::TxnConfig;
 use dojo_world::utils::TransactionExt;
 use itertools::Itertools;
 use starknet::accounts::{Account, Call, ConnectedAccount};
-use starknet::core::types::{
-    FieldElement, InvokeTransactionResult, TransactionExecutionStatus, TransactionStatus,
-};
+use starknet::core::types::FieldElement;
 use starknet::core::utils::get_selector_from_name;
-use starknet::providers::Provider;
 use starknet_crypto::poseidon_hash_many;
-use tokio::time::sleep;
-use tracing::{info, warn};
+use tracing::{trace, warn};
 
 use crate::dojo_os::STARKNET_ACCOUNT;
+use crate::verifier::utils::wait_for_sent_transaction;
 
 pub async fn starknet_verify(
     fact_registry_address: FieldElement,
@@ -51,9 +46,9 @@ pub async fn starknet_verify(
             .await
             .context("Failed to send `publish_fragment` transaction.")?;
 
-        info!("Sent `publish_fragment` transaction {:#x}", tx.transaction_hash);
+        trace!("Sent `publish_fragment` transaction {:#x}", tx.transaction_hash);
 
-        wait_for(tx).await?;
+        wait_for_sent_transaction(tx).await?;
 
         nonce += 1u64.into();
     }
@@ -71,7 +66,7 @@ pub async fn starknet_verify(
             to: fact_registry_address,
             selector: get_selector_from_name("verify_and_register_fact_from_fragments")
                 .expect("invalid selector"),
-            calldata: dbg!(calldata),
+            calldata,
         }])
         .nonce(nonce)
         .send_with_cfg(&txn_config)
@@ -79,50 +74,7 @@ pub async fn starknet_verify(
         .context("Failed to send `verify_and_register_fact_from_fragments` transaction.")?;
 
     let transaction_hash = format!("{:#x}", tx.transaction_hash);
-    wait_for(tx).await?;
+    wait_for_sent_transaction(tx).await?;
 
     Ok((transaction_hash, nonce + 1u64.into()))
-}
-
-async fn wait_for(tx: InvokeTransactionResult) -> anyhow::Result<()> {
-    let start_fetching = std::time::Instant::now();
-    let wait_for = Duration::from_secs(60);
-    let execution_status = loop {
-        if start_fetching.elapsed() > wait_for {
-            anyhow::bail!("Transaction not mined in {} seconds.", wait_for.as_secs());
-        }
-
-        let status =
-            match STARKNET_ACCOUNT.provider().get_transaction_status(tx.transaction_hash).await {
-                Ok(status) => status,
-                Err(_e) => {
-                    sleep(Duration::from_secs(1)).await;
-                    continue;
-                }
-            };
-
-        break match status {
-            TransactionStatus::Received => {
-                info!("Transaction received.");
-                sleep(Duration::from_secs(1)).await;
-                continue;
-            }
-            TransactionStatus::Rejected => {
-                anyhow::bail!("Transaction {:#x} rejected.", tx.transaction_hash);
-            }
-            TransactionStatus::AcceptedOnL2(execution_status) => execution_status,
-            TransactionStatus::AcceptedOnL1(execution_status) => execution_status,
-        };
-    };
-
-    match execution_status {
-        TransactionExecutionStatus::Succeeded => {
-            info!("Transaction accepted on L2.");
-        }
-        TransactionExecutionStatus::Reverted => {
-            anyhow::bail!("Transaction failed with.");
-        }
-    }
-
-    Ok(())
 }

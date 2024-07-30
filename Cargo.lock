@@ -3277,7 +3277,7 @@ dependencies = [
 [[package]]
 name = "cairo-proof-parser"
 version = "0.1.0"
-source = "git+https://github.com/cartridge-gg/cairo-proof-parser?rev=e5e858a0a48ddf2fba22f00543d34bad1d56a63c#e5e858a0a48ddf2fba22f00543d34bad1d56a63c"
+source = "git+https://github.com/cartridge-gg/cairo-proof-parser?rev=e15d3add58ec1db8da51627b02798fa10c2adfa3#e15d3add58ec1db8da51627b02798fa10c2adfa3"
 dependencies = [
  "anyhow",
  "clap",
@@ -12233,7 +12233,7 @@ dependencies = [
 [[package]]
 name = "serde-felt"
 version = "0.1.0"
-source = "git+https://github.com/cartridge-gg/cairo-proof-parser?rev=e5e858a0a48ddf2fba22f00543d34bad1d56a63c#e5e858a0a48ddf2fba22f00543d34bad1d56a63c"
+source = "git+https://github.com/cartridge-gg/cairo-proof-parser?rev=e15d3add58ec1db8da51627b02798fa10c2adfa3#e15d3add58ec1db8da51627b02798fa10c2adfa3"
 dependencies = [
  "serde",
  "starknet-crypto 0.6.2",

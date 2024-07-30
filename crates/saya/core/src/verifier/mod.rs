@@ -11,6 +11,7 @@ use ::starknet::core::types::FieldElement;
 use serde::{Deserialize, Serialize};
 
 mod starknet;
+pub mod utils;
 
 /// Supported verifiers.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
