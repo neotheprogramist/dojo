@@ -7,6 +7,8 @@
 // pub mod input;
 // pub mod transaction;
 
+pub mod piltover;
+
 use std::time::Duration;
 
 use anyhow::{bail, Context};
@@ -23,6 +25,7 @@ use starknet::providers::{JsonRpcClient, Provider};
 use starknet::signers::{LocalWallet, SigningKey};
 use tokio::time::sleep;
 use url::Url;
+
 // will need to be read from the environment for chains other than sepoia
 pub const STARKNET_URL: &str =
     "https://starknet-sepolia.g.alchemy.com/v2/PovJ0plog8O9RxyaPMYAZiKHqZ5LLII_";
@@ -57,10 +60,10 @@ pub async fn starknet_apply_diffs(
     nonce: FieldElement,
 ) -> anyhow::Result<String> {
     let calldata = chain![
-        vec![FieldElement::from(new_state.len() as u64 / 2)].into_iter(),
+        [FieldElement::from(new_state.len() as u64 / 2)].into_iter(),
         new_state.clone().into_iter(),
         program_output.into_iter(),
-        vec![program_hash],
+        [program_hash],
     ]
     .collect();
 
