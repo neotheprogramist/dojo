@@ -6,7 +6,7 @@ use starknet::accounts::{Account, Call, ConnectedAccount};
 use starknet::core::types::FieldElement;
 use starknet::core::utils::get_selector_from_name;
 use starknet_crypto::poseidon_hash_many;
-use tracing::{trace, warn};
+use tracing::trace;
 
 use crate::dojo_os::STARKNET_ACCOUNT;
 use crate::verifier::utils::wait_for_sent_transaction;
@@ -17,7 +17,7 @@ pub async fn starknet_verify(
     cairo_version: FieldElement,
 ) -> anyhow::Result<(String, FieldElement)> {
     if serialized_proof.len() > 2000 {
-        warn!(
+        trace!(
             "Calldata too long at: {} felts, transaction could fail, splitting it.",
             serialized_proof.len()
         );
