@@ -3,6 +3,7 @@ use starknet_crypto::FieldElement;
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub struct BatcherOutput {
+    pub padding: [FieldElement; 2],
     pub prev_state_root: FieldElement,
     pub new_state_root: FieldElement,
     pub block_number: FieldElement,

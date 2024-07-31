@@ -9,7 +9,6 @@ use cairo_proof_parser::output::ExtractOutputResult;
 use cairo_proof_parser::{from_felts, StarkProof};
 use dojo_os::piltover::{starknet_apply_piltover, PiltoverCalldata};
 use futures::future;
-use itertools::Itertools;
 use katana_primitives::block::{BlockNumber, FinalityStatus, SealedBlock, SealedBlockWithStatus};
 use katana_primitives::state::StateUpdatesWithDeclaredClasses;
 use katana_primitives::transaction::Tx;
@@ -471,7 +470,7 @@ impl Saya {
                 todo!("Ephemeral mode does not support publishing updated state yet.");
             }
             SayaMode::Persistent => {
-                let serialized_output = program_output.iter().skip(2).copied().collect_vec();
+                let serialized_output = program_output; // .iter().skip(2).copied().collect_vec();
                 let batcher_output = from_felts::<BatcherOutput>(&serialized_output)
                     .context("Failed to parse program output.")?;
 
