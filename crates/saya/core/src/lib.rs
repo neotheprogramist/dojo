@@ -23,6 +23,7 @@ use prover_sdk::ProverResult;
 use saya_provider::rpc::JsonRpcProvider;
 use saya_provider::Provider as SayaProvider;
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use starknet::accounts::{Call, ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::{BlockId, BlockTag};
 use starknet::core::utils::cairo_short_string_to_felt;
@@ -450,16 +451,19 @@ impl Saya {
         // Publish state difference if DA client is available.
         if let Some(da) = &self.da_client {
             trace!(target: LOG_TARGET, last_block, "Publishing DA.");
-
+            let half_len = proof.program_output.len() / 2;
+            let first_half = &proof.program_output[0..half_len];
+            let first_half_removed = &first_half[1..];
+            let starknet_os_output: StarknetOsOutput = from_felts(&first_half_removed.to_vec())?;
+            let proof = serde_json::to_value(&proof.proof)?;
             let checkpoint = PublishedStateDiff {
                 prev_state_root: state_roots.0,
                 state_root: state_roots.1,
                 prev_height: self.prev_height,
                 prev_commitment: self.prev_commitment,
-                proof: serde_json::to_value(&proof.proof).unwrap(),
+                starknet_os_output,
+                proof,
             };
-            // let ns = Namespace::new_v0(b"saya-dev").unwrap();
-            // let commitment = Commitment::from_blob(ns, 0, &serialized_proof.iter().map(|felt| felt.to_bytes()).collect::<Vec<_>>());
             let (commitment, height) = if self.config.mode != SayaMode::Ephemeral {
                 da.publish_checkpoint(checkpoint).await?
             } else if self.config.skip_publishing_proof {
@@ -471,67 +475,6 @@ impl Saya {
             self.prev_height = Some(height);
 
             info!(target: LOG_TARGET,"commitment: {:?}, height: {:?}", commitment.0, height);
-        }
-
-        let program_hash = proof.program_hash;
-        let program_output_hash = proof.program_output_hash;
-        let program_output = proof.program_output;
-
-        let program_hash_string = program_hash;
-        let program_output_hash_string = program_output_hash;
-
-        info!(target: LOG_TARGET,"Extracted program hash and output hash. {:?} {:?}", program_hash_string, program_output_hash_string);
-        let expected_fact = poseidon_hash_many(&[program_hash, program_output_hash]).to_string();
-        let program = program_hash.to_string();
-        info!(target: LOG_TARGET, expected_fact, program, "Expected fact.");
-
-        let starknet_account = self.config.starknet_account.get_starknet_account()?;
-
-        // Verify the proof and register fact.
-        trace!(target: LOG_TARGET, last_block, "Verifying block.");
-        let (transaction_hash, _nonce) = verifier::verify(
-            VerifierIdentifier::HerodotusStarknetSepolia(self.config.fact_registry_address),
-            serialized_proof,
-            &starknet_account,
-            self.config.mode.to_program().cairo_version(),
-        )
-        .await?;
-        info!(target: LOG_TARGET, last_block, transaction_hash, "Block verified.");
-
-        // Apply the diffs to the world state.
-        match self.config.mode {
-            SayaMode::Ephemeral => {
-                // Needs checker program to be verified, and set as the upgrade_state authority
-                todo!("Ephemeral mode does not support publishing updated state yet.");
-            }
-            SayaMode::Persistent => {
-                let serialized_output = program_output.iter().copied().collect_vec();
-                println!("serialized_output: {:?}", serialized_output);
-
-                // todo!("Persistent mode does not support publishing updated state with SNOS yet.");
-
-                let deduplicated_output =
-                    serialized_output[1..serialized_output.len() / 2].to_vec();
-                let batcher_output = from_felts::<StarknetOsOutput>(&deduplicated_output).unwrap();
-                let piltover_calldata = PiltoverCalldata {
-                    program_output: serialized_output,
-                    // onchain_data_hash: batcher_output.new_state_root,
-                    onchain_data_hash: batcher_output.new_block_hash,
-                    onchain_data_size: (Felt::ZERO, Felt::ZERO),
-                };
-
-                let expected_state_root = batcher_output.new_block_hash.to_string();
-                let expected_block_number =
-                    (batcher_output.new_block_number - Felt::ONE).to_string();
-                info!(target: LOG_TARGET, last_block, expected_state_root, expected_block_number, "Applying snos to piltover.");
-
-                starknet_apply_piltover(
-                    piltover_calldata,
-                    self.config.settlement_contract,
-                    &starknet_account,
-                )
-                .await?;
-            }
         }
         Ok(())
     }

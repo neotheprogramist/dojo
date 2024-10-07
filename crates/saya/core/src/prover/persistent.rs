@@ -39,6 +39,7 @@ pub struct PublishedStateDiff {
     pub state_root: Felt,
     pub prev_height: Option<BlockHeight>,
     pub prev_commitment: Option<Commitment>,
+    pub starknet_os_output: StarknetOsOutput,
     pub proof: serde_json::Value,
 }
 

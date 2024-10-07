@@ -26,22 +26,11 @@ SAYA_PROGRAM_HASH=0x2aa9e430c145b26d681a8087819ed5bff93f5596105d0e74f00fc7caa46f
 # Set after runnig the script
 
 SAYA_WORLD_ADDRESS=""
-SAYA_WORLD_PREPARED="" # Set to anything after preparing the world successfully for the first time
-SAYA_FORK_BLOCK_NUMBER=
-SAYA_SKIP_MAKING_TRANSACTIONS="" # Set to anything to skip making transactions
-SAYA_PILTOVER_ADDRESS=""
-SAYA_PILTOVER_PREPARED=
-SAYA_FACT_REGISTRY=""
+SAYA_WORLD_PREPARED="12" # Set to anything after preparing the world successfully for the first time
+SAYA_FORK_BLOCK_NUMBER=221459
+SAYA_SKIP_MAKING_TRANSACTIONS="asdasd" # Set to anything to skip making transactions
 
 
-if [[ -z "${SAYA_FACT_REGISTRY}" ]]; then
-    sncast -a $SAYA_SNCAST_ACCOUNT_NAME deploy \
-        --class-hash $SAYA_FACT_REGISTRY_CLASS_HASH \
-        --fee-token eth \
-        -u $SAYA_SEPOLIA_ENDPOINT
-    echo "Set SAYA_FACT_REGISTRY to the address of the deployed contract."
-    exit 0
-fi
 if [[ -z "${SAYA_WORLD_ADDRESS}" ]]; then
   echo "World address not set: DEPLOYING WORLD"
 
@@ -113,30 +102,7 @@ if [[ -z "${SAYA_FORK_BLOCK_NUMBER}" ]]; then
     exit 0
 fi
 
-if [[ -z "${SAYA_PILTOVER_ADDRESS}" ]]; then
-    sncast -a $SAYA_SNCAST_ACCOUNT_NAME deploy \
-        --class-hash $SAYA_PILTOVER_CLASS_HASH \
-        -c $SAYA_SEPOLIA_ACCOUNT_ADDRESS $SAYA_PILTOVER_STARTING_STATE_ROOT $(expr $SAYA_FORK_BLOCK_NUMBER + 1) 0 \
-        --fee-token eth \
-        -u $SAYA_SEPOLIA_ENDPOINT
 
-
-    echo "Set SAYA_PILTOVER_ADDRESS to the address of the deployed contract."
-    exit 0
-fi
-
-if [[ -z "${SAYA_PILTOVER_PREPARED}" ]]; then
-    sncast -a $SAYA_SNCAST_ACCOUNT_NAME --wait invoke \
-        --contract-address $SAYA_PILTOVER_ADDRESS --function set_program_info -c $SAYA_PROGRAM_HASH $SAYA_CONFIG_HASH \
-        --fee-token eth \
-        -u $SAYA_SEPOLIA_ENDPOINT
-
-    sncast -a $SAYA_SNCAST_ACCOUNT_NAME --wait invoke \
-        --contract-address $SAYA_PILTOVER_ADDRESS --function set_facts_registry -c $SAYA_FACT_REGISTRY \
-        --fee-token eth \
-        -u $SAYA_SEPOLIA_ENDPOINT
-
-fi
 
 
 if [[ -z "${SAYA_SKIP_MAKING_TRANSACTIONS}" ]]; then
@@ -157,17 +123,11 @@ if [[ -z "${SAYA_SKIP_MAKING_TRANSACTIONS}" ]]; then
         --wait
 fi
 
-
-cargo run -r --bin sozo -- model get Moves $SAYA_SEPOLIA_ACCOUNT_ADDRESS \
-    --manifest-path $SAYA_MANIFEST_PATH \
-    --rpc-url $SAYA_SEPOLIA_ENDPOINT \
-    --world $SAYA_WORLD_ADDRESS
-
 cargo run -r --bin saya -- \
     --mode persistent \
     --rpc-url http://localhost:5050 \
-    --registry $SAYA_FACT_REGISTRY \
-    --settlement-contract $SAYA_PILTOVER_ADDRESS \
+    --registry 0x2fefd6635e48a180c1b1f5263e119d453659be44c65bd2083bb80499730dfa9 \
+    --settlement-contract 0x43dd3902d3fdbb970d8bd3315cb55a4194651b8623354113dce67219ec770c7 \
     --world $SAYA_WORLD_ADDRESS \
     --prover-url $SAYA_PROVER_URL \
     --store-proofs \
@@ -178,7 +138,7 @@ cargo run -r --bin saya -- \
     --batch-size 1 \
     --start-block $(expr $SAYA_FORK_BLOCK_NUMBER + 1) \
     --da-chain celestia \
-    --celestia-node-url http://localhost:26658 \
+    --celestia-node-url http://celestia-arabica.cartridge.gg \
     --celestia-namespace saya-dev \
     --celestia-node-auth-token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJwdWJsaWMiLCJyZWFkIiwid3JpdGUiLCJhZG1pbiJdfQ.kjW6UL2m2XIylCDzG5vwgyW5YA75LyLzXMbnp8Fpe_E
     # --end-block $(expr $SAYA_FORK_BLOCK_NUMBER + 4)
