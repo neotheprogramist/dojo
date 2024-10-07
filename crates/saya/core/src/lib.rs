@@ -23,7 +23,6 @@ use prover_sdk::ProverResult;
 use saya_provider::rpc::JsonRpcProvider;
 use saya_provider::Provider as SayaProvider;
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use starknet::accounts::{Call, ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::{BlockId, BlockTag};
 use starknet::core::utils::cairo_short_string_to_felt;
